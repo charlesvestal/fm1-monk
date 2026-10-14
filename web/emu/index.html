@@ -49,6 +49,10 @@ a { color: var(--accent); }
 .bar { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; align-items: center; margin: .9rem 0 0; color: var(--muted); font-size: .92rem; }
 .bar button { font: inherit; color: var(--ink); background: var(--card); border: 1px solid var(--rule); border-radius: 8px; padding: .3em .8em; cursor: pointer; }
 .bar .cpu { font-variant-numeric: tabular-nums; }
+/* what changes while playing keeps its width, so nothing beside it moves */
+.bar .touch { display: inline-block; min-width: 22ch; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bar .touch b { display: inline-block; min-width: 3ch; text-align: right; font-weight: 400; }
+.bar .num { display: inline-block; min-width: 3ch; text-align: right; font-variant-numeric: tabular-nums; }
 .help h2 { font: 600 1.1rem "Barlow Semi Condensed", "Barlow", sans-serif; margin: 0 0 .3rem; }
 .help { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem 2rem; margin: 1.6rem 0 0; }
 .help h2 { font: 600 1.1rem "Barlow Semi Condensed", "Barlow", sans-serif; margin: 0 0 .3rem; }
@@ -73,11 +77,11 @@ kbd { font: 600 .85em ui-monospace, Menlo, monospace; background: var(--card); b
 </div>
 
 <div class="bar">
-  <span id="status">Off. Sound starts when you switch it on.</span>
-  <span class="cpu" id="touch"></span>
-  <label>Keyboard velocity <input id="kvel" type="range" min="1" max="127" value="90"> <span id="kvelv">90</span></label>
-  <span class="cpu" id="cpu"></span>
+  <span class="touch" id="touch">Velocity <b>–</b>, aftertouch <b>–</b></span>
+  <label>Keyboard velocity <input id="kvel" type="range" min="1" max="127" value="90"> <span class="num" id="kvelv">90</span></label>
   <button id="reset" type="button" title="Forget your changes to the singers, and start again from the factory settings">Factory reset</button>
+  <span id="status">Off. Sound starts when you switch it on.</span>
+  <span class="cpu" id="cpu"></span>
 </div>
 
 <section class="help">
@@ -409,7 +413,8 @@ function drawScreen(fb) {
 }
 const touchEl = document.getElementById("touch");
 function drawTouch(t) {                                       // the sounding note's velocity and pressure
-  touchEl.textContent = t ? `Velocity ${t & 127}, aftertouch ${(t >> 8) & 127}` : "";
+  const v = t ? t & 127 : "–", a = t ? (t >> 8) & 127 : "–";
+  touchEl.innerHTML = `Velocity <b>${v}</b>, aftertouch <b>${a}</b>`;
 }
 function drawLights(b, k) {
   for (const x of Object.values(buttons)) x.g.classList.toggle("lit", !!(b & (1 << x.bit)));
