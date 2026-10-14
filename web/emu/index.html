@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MONK-1 in the browser</title>
-<meta name="description" content="Play MONK-1, twelve singing characters after MonkSynth for the M-VAVE FM-1, in your browser: the same code the FM-1 runs, velocity and pressure included.">
+<meta name="description" content="Play MONK-1, twelve singing characters after MonkSynth for the M-VAVE FM-1, in your browser: the same code the FM-1 runs, velocity and aftertouch included.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Semi+Condensed:wght@600;700&display=swap">
@@ -85,8 +85,8 @@ kbd { font: 600 .85em ui-monospace, Menlo, monospace; background: var(--card); b
     <h2>Playing</h2>
     <ul>
       <li>The <b>keys</b> sing, one voice: the newest key held sounds; let go and it falls back to the one under it, gliding.</li>
-      <li><b>How hard a key lands</b> sets the note's level: lower on the key is harder.</li>
-      <li><b>Pressing harder</b> on a held key moves the vowel: drag down from where you landed. (The seven keys at the right end, C♯ to G, have no pressure on the FM-1, so none here either.)</li>
+      <li><b>Velocity</b> sets the note's level: click lower on a key for more.</li>
+      <li><b>Aftertouch</b> moves the vowel: drag down on a held key. (The seven keys at the right end, C♯ to G, have no aftertouch on the FM-1, so none here either.)</li>
       <li><b>PRESETS</b> the singer, <b>ALGORITHM</b> the vowel, <b>OCT−</b> / <b>OCT+</b> the octave.</li>
       <li><b>PLAY</b> HOLD: the note stays after the key.</li>
     </ul>
@@ -103,8 +103,8 @@ kbd { font: 600 .85em ui-monospace, Menlo, monospace; background: var(--card); b
     <h2>Mouse, touch, keyboard</h2>
     <ul>
       <li>Drag a knob up or down, or scroll over it.</li>
-      <li>Keys: where you press is how hard it lands; drag down to press harder. A pen's own pressure works too. Several fingers at once on a touch screen.</li>
-      <li>Computer keys: <kbd>A</kbd>–<kbd>'</kbd> the white keys from F, <kbd>W</kbd> <kbd>E</kbd> <kbd>R</kbd> <kbd>Y</kbd> <kbd>U</kbd> <kbd>O</kbd> <kbd>P</kbd> <kbd>[</kbd> the black ones, at the velocity set below the FM-1. Hold <kbd>Shift</kbd> to press harder.</li>
+      <li>Keys: click lower for more velocity, drag down for aftertouch. A pen's own pressure works too. Several fingers at once on a touch screen.</li>
+      <li>Computer keys: <kbd>A</kbd>–<kbd>'</kbd> the white keys from F, <kbd>W</kbd> <kbd>E</kbd> <kbd>R</kbd> <kbd>Y</kbd> <kbd>U</kbd> <kbd>O</kbd> <kbd>P</kbd> <kbd>[</kbd> the black ones, at the velocity set below the FM-1. Hold <kbd>Shift</kbd> for aftertouch.</li>
       <li><kbd>Space</kbd> HOLD, <kbd>Z</kbd> / <kbd>X</kbd> OCT− / OCT+, <kbd>↑</kbd> <kbd>↓</kbd> the singer, <kbd>←</kbd> <kbd>→</kbd> the vowel.</li>
       <li><kbd>Shift</kbd>-click (or right-click) a button to hold it down, click again to let go.</li>
     </ul>
@@ -348,7 +348,7 @@ for (const k of Object.values(knobs)) {
   });
 }
 
-// the computer's keys: a piano's two rows from F, at the slider's velocity; Shift presses harder
+// the computer's keys: a piano's two rows from F, at the slider's velocity; Shift: aftertouch
 const KEYMAP = {};
 "ASDFGHJKL".split("").forEach((c, i) => KEYMAP["Key" + c] = { key: WHITE_K[i] });
 KEYMAP.Semicolon = { key: WHITE_K[9] };
@@ -409,7 +409,7 @@ function drawScreen(fb) {
 }
 const touchEl = document.getElementById("touch");
 function drawTouch(t) {                                       // the sounding note's velocity and pressure
-  touchEl.textContent = t ? `Velocity ${t & 127}, pressure ${(t >> 8) & 127}` : "";
+  touchEl.textContent = t ? `Velocity ${t & 127}, aftertouch ${(t >> 8) & 127}` : "";
 }
 function drawLights(b, k) {
   for (const x of Object.values(buttons)) x.g.classList.toggle("lit", !!(b & (1 << x.bit)));

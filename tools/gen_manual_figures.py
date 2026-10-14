@@ -114,7 +114,7 @@ def panel(screen_png):
         if bot[i][1]:
             s.append(what(x + 27, 330, bot[i][1]))
     s.append(keybed(36, 400, W - 72, 270))
-    s.append(what(W / 2, 698, "Keys: sing. How hard a key lands sets its level; pressing harder moves the vowel "
+    s.append(what(W / 2, 698, "Keys: sing. Velocity sets the level; aftertouch moves the vowel "
                               "(all but the seven at the right end)"))
     s.append("</svg>")
     return "".join(s)

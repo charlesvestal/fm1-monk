@@ -6,10 +6,9 @@ an homage to the Delay Lama plug-in by AudioNerdz, 2002), with the twelve charac
 [its iOS port](https://github.com/charlesvestal/monksynth-ios). Each one sings in its own voice on
 its own stage; the mouth follows the vowel, in frames, as the original's sprite sheet did.
 
-The keys feel how they are played, without hardware changes, by way of
+Velocity and aftertouch from the FM-1's own keys, with no hardware changes, by way of
 [Velo](https://github.com/charlesvestal/fm1-velocity)'s sensing: velocity sets each note's level,
-and leaning on a held key moves the vowel (or bends the pitch, or both), counted from where the key
-rests. Velocity and aftertouch on an FM-1.
+aftertouch moves the vowel (or bends the pitch, or both), counted from where the key rests.
 
 ![Jerry the monk singing](docs/img/screen-singing.png) ![Philip the unicorn](docs/img/screen-unicorn.png) ![Snider](docs/img/screen-punk.png)
 
@@ -26,8 +25,8 @@ donation at [savetibet.org](https://www.savetibet.org).
 | | |
 |---|---|
 | keys | sing. One voice: the newest key held sounds, letting go falls back to the one under it, and moving between held keys glides (GLIDE) |
-| how hard a key lands | its level (Touch: Velocity) |
-| pressing harder | moves the vowel (Touch: Pressure, Depth, Sensitive) |
+| velocity | the note's level (Touch: Velocity) |
+| aftertouch | moves the vowel (Touch: Pressure, Depth, Sensitive) |
 | PRESETS | the singer: Jerry the monk, Guppo, Philip, Suze, Gerald, Bess, EeOo, Snider, Fipsy, Peppo, Marley, Razor. Each loads its voice and remembers your changes |
 | ALGORITHM | the vowel, on any page |
 | page buttons | a set of knobs each: HOME Sing, EDIT Choir, LFO Vibrato, FX Echo, ENV Envelope, GLO Touch. The menu (the button, the page, whose the knobs are, the knobs, the encoders) comes up over the singer when a page button, a knob or PRESETS is touched, and goes after a few seconds |
@@ -45,7 +44,7 @@ The pages:
 | Vibrato | LFO | Depth | Rate | Tune | |
 | Echo | FX | Amount | Time | | |
 | Envelope | ENV | Attack | Decay | Sustain | Release |
-| Touch (all singers) | GLO | Pressure (vowel, pitch, both, both inverted) | Depth | Sensitive (how far a lean goes) | Velocity (how much it sets the level) |
+| Touch (all singers) | GLO | Pressure (vowel, pitch, both, both inverted) | Depth | Sensitive (how much aftertouch it takes) | Velocity (how much it sets the level) |
 
 USB MIDI out: the notes on channel 1 with their velocity, and polyphonic aftertouch. In: notes (any
 channel), CC 1 vowel, 5 glide, 7 level, 12 echo, 13 head size, aftertouch, CC 123 all notes off.

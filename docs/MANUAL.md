@@ -2,9 +2,9 @@
 
 MONK-1 turns the M-VAVE FM-1 into twelve singers. Each one sings in its own voice, from a monk to a
 slice of pizza, on its own little stage, and its mouth follows the vowel as it sings. The voice is
-MonkSynth, Jonathan Taylor's formant vocal synthesizer, and the keys feel how they are played:
-how hard a key lands sets the note's level, and pressing harder on a held key moves the vowel. That
-is velocity and aftertouch on an FM-1, with no changes to the hardware.
+MonkSynth, Jonathan Taylor's formant vocal synthesizer. The keys have velocity and aftertouch, read
+from the FM-1's own keys with no changes to the hardware: velocity sets the note's level, aftertouch
+moves the vowel.
 
 ![The FM-1 (a drawing), running MONK-1, each control labelled](img/fm1-panel.svg)
 
@@ -30,8 +30,8 @@ is velocity and aftertouch on an FM-1, with no changes to the hardware.
 ## 1. Install
 
 **Try it first:** the [MONK-1 emulator](https://charlesvestal.github.io/fm1-monk/emu/) runs the same
-code in the browser, with sound. Where you press a key is how hard it lands, and dragging down on it
-presses harder; on the computer keyboard, hold Shift to press harder.
+code in the browser, with sound. Click lower on a key for more velocity and drag down for
+aftertouch; on the computer keyboard, hold Shift for aftertouch.
 
 **Install:** open the [web installer](https://charlesvestal.github.io/fm1-monk/install/) in Chrome or
 Edge, connect the FM-1 with a USB data cable and press Install. Don't unplug it while it's
@@ -60,8 +60,8 @@ python3 tools/fm1_install.py monk-0.9.fwsc
 
 ## 2. Getting started
 
-1. **Sing.** Press a key: Jerry the monk sings it. Press harder and the note is louder; keep the key
-   down and lean on it, and the vowel moves on, towards "ee".
+1. **Sing.** Press a key: Jerry the monk sings it. Higher velocity is louder; aftertouch on a held
+   key moves the vowel on, towards "ee".
 2. **Glide.** Hold a key and press another: the voice glides up to it. Let go of the second and it
    glides back to the first.
 3. **Change the vowel.** Turn ALGORITHM. The mouth follows.
@@ -82,8 +82,8 @@ The drawing at the top shows them all; here they are in more detail.
 | Control | What it does |
 |---|---|
 | Keys | Sing. One voice: the newest key held sounds; let go and it falls back to the key still held under it |
-| How hard a key lands | The note's level (Touch: Velocity) |
-| Pressing harder on a held key | The vowel moves, or the pitch rises, or both (Touch: Pressure) |
+| Velocity | The note's level (Touch: Velocity) |
+| Aftertouch | The vowel moves, or the pitch rises, or both (Touch: Pressure) |
 | OCT− / OCT+ | The keys an octave down or up, from −2 to +2 |
 | KNOB 1–4 | The four knobs of the page on the screen |
 | PRESETS | The singer |
@@ -129,29 +129,29 @@ each time the key is read, because a lit light upsets the reading; you may see t
 
 ## 5. Playing
 
-![Pressing harder: the vowel moves on](img/screen-pressure.png)
+![Aftertouch: the vowel moves on](img/screen-pressure.png)
 ![The Touch page](img/screen-touch.png)
 
 **One voice.** MONK-1 sings one note at a time, as a singer does. The newest key held sounds; let go
 and the voice goes back to the key still held under it. Moving between held keys glides (Sing:
 Glide; at 0 it jumps).
 
-**Velocity.** How hard a key lands sets the note's level. Touch: Velocity says how much: at 0 every
+**Velocity** sets the note's level. Touch: Velocity says how much: at 0 every
 note is as loud as every other, at 100 a light touch is very quiet. A medium press, about velocity
 100, keeps the level the singer was made with.
 
-**Pressure.** Once a key is down, pressing harder on it moves the voice. MONK-1 counts the pressure
-from where the key comes to rest after you play it, not from the moment it lands, so resting a finger
-on a key does nothing and only leaning into it does. On the Touch page:
+**Aftertouch** moves the voice. MONK-1 counts it from where the key comes to rest after you play it,
+not from the moment it lands, so resting a finger on a key sends none; pressing further in does. On
+the Touch page:
 
-- **Pressure** says where it goes: VOWEL moves the vowel on, towards "ee"; PITCH bends the note up,
+- **Pressure** says where aftertouch goes: VOWEL moves the vowel on, towards "ee"; PITCH bends the note up,
   as far as two semitones; BOTH does both; BOTH INV moves the vowel back, towards "oo", as the pitch
   rises.
-- **Depth** is how far full pressure moves the vowel.
-- **Sensitive** is how little a lean it takes: higher means a lighter press reaches full pressure.
+- **Depth** is how far full aftertouch moves the vowel.
+- **Sensitive:** higher means a lighter press reaches full aftertouch.
 
 The seven keys at the right end (C♯ to G) are wired differently inside the FM-1: they have velocity
-but no pressure.
+but no aftertouch.
 
 **HOLD.** PLAY turns HOLD on: the note keeps sounding after you let go, until another key takes over
 or you press PLAY again.
@@ -249,8 +249,8 @@ ends to cancel.
 **Calibration:** if a button or knob does the wrong thing, hold OCT− and OCT+ while you switch the
 FM-1 on. The screen then asks you to press each button and turn each knob in turn.
 
-**Velocity or pressure feel off:** keys differ a little from one FM-1 to the next. Turn Touch:
-Sensitive up if leaning on a key hardly moves the vowel, down if it jumps; Touch: Velocity down if
+**Velocity or aftertouch feel off:** keys differ a little from one FM-1 to the next. Turn Touch:
+Sensitive up if aftertouch hardly moves the vowel, down if it jumps; Touch: Velocity down if
 the levels vary too much.
 
 **After a crash:** MONK-1 shows a red CRASH screen and restarts by itself a few seconds later. If you

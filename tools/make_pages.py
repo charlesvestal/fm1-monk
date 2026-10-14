@@ -71,16 +71,15 @@ code { font-size: .9em; }
 <h1>MONK-1</h1>
 <p class="sub">Twelve singers for the M-VAVE FM-1</p>
 <p class="lede">MonkSynth's singing voice on the FM-1, with the twelve characters of its iOS port, from a monk to a
-slice of pizza, each on its own stage, its mouth following the vowel. The keys feel how they are played: how
-hard a key lands sets the level, and leaning on a held key moves the vowel. Velocity and aftertouch, on an
-FM-1, with no changes to the hardware.</p>
+slice of pizza, each on its own stage, its mouth following the vowel. Velocity sets the level
+and aftertouch moves the vowel, read from the FM-1's own keys with no changes to the hardware.</p>
 <div class="shots">
   <img src="img/screen-singing.png" width="240" height="240" alt="Jerry the monk singing, mouth wide open">
   <img src="img/screen-unicorn.png" width="240" height="240" alt="Philip the unicorn singing in front of a rainbow">
   <img src="img/screen-punk.png" width="240" height="240" alt="Snider the punk singing between two speakers">
 </div>
 <nav class="ways" aria-label="Get MONK-1">
-  <a href="emu/"><strong>Try it in the browser</strong><span>The same code the FM-1 runs, with sound. Where you press a key is how hard it lands; drag down to lean on it.</span></a>
+  <a href="emu/"><strong>Try it in the browser</strong><span>The same code the FM-1 runs, with sound. Click lower on a key for more velocity; drag down for aftertouch.</span></a>
   <a href="install/"><strong>Install <em class="v">v__VERSION__</em></strong><span>From Chrome or Edge, with the FM-1 connected by USB. Nothing to install on the computer.</span></a>
   <a href="manual/"><strong>Manual</strong><span>Getting started in a few minutes, then everything else.</span></a>
   <a href="firmware/__PKG__"><strong>Download <em class="v">__PKG__</em></strong><span>For the command-line installer: <code>python3 tools/fm1_install.py __PKG__</code></span></a>
@@ -90,8 +89,8 @@ FM-1, with no changes to the hardware.</p>
 <h2>What it does</h2>
 <ul class="feat">
   <li><b>Twelve singers.</b> Jerry the monk, Guppo, Philip, Suze, Gerald, Bess, EeOo, Snider, Fipsy, Peppo, Marley and Razor, each with its own voice, each remembering your changes.</li>
-  <li><b>Velocity.</b> How hard a key lands sets the note's level, read from the FM-1's own keys.</li>
-  <li><b>Pressure.</b> Leaning on a held key moves the vowel, bends the pitch, or both, counted from where the key rests.</li>
+  <li><b>Velocity</b> sets the note's level, read from the FM-1's own keys.</li>
+  <li><b>Aftertouch</b> moves the vowel, bends the pitch, or both, counted from where the key rests.</li>
   <li><b>The voice.</b> MonkSynth's formant synthesis: vowel, head size, breath, glide, a choir of up to ten, vibrato, echo and an envelope, four knobs a page.</li>
   <li><b>MIDI.</b> Notes with velocity and polyphonic aftertouch out over USB; notes, aftertouch and the vowel in.</li>
 </ul>
