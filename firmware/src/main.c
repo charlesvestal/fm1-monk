@@ -11,9 +11,11 @@
 static void plat_analog_sample(uint32_t col, uint32_t rowbit, uint32_t v, uint32_t driven);   /* app/plat_fm1.c */
 static int plat_analog_drive(uint32_t col, uint32_t rowbit);
 static void plat_probe_sample(uint32_t col, uint32_t rowbit, uint32_t v, uint32_t pressed);
+static int plat_analog_led_ok(uint32_t col, uint32_t rowbit);      /* app/plat_fm1.c */
 #define FM1_INPUT_ANALOG(c, r, v, d) plat_analog_sample(c, r, v, d)
 #define FM1_INPUT_DRIVE(c, r) plat_analog_drive(c, r)
 #define FM1_INPUT_PROBE(c, r, v, p) plat_probe_sample(c, r, v, p)
+#define FM1_INPUT_LED_OK(c, r) plat_analog_led_ok(c, r)
 #include "fm1_input.h"
 #include "fm1_timer.h"
 #include "fm1_audio.h"

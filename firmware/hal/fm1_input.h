@@ -122,6 +122,21 @@ static volatile struct {
     uint32_t frames;
 } fm1_in;
 static uint8_t fm1_led[FM1_NCOL];
+/* dim LEDs (FoMni's "glow"), lit on one scan frame in fm1_led_dim_div (0 = off) */
+static uint8_t fm1_led_dim[FM1_NCOL];
+static volatile uint8_t fm1_led_dim_div;
+static uint8_t fm1__dim_frame;
+/* MONK-1: a lit LED's current goes through its column line and lifts the readings of that column's keys
+ * (Velo measured +25 counts): a key that is held would see its pressure jump when an LED in its column
+ * changes. FM1_INPUT_LED_OK(col, rowbit) answers 0 for a key that is not open: its column's LEDs then
+ * stay dark on the ticks that sample it (the other ticks light them, so the buttons barely dim). */
+#ifndef FM1_INPUT_LED_OK
+#define FM1_INPUT_LED_OK(col, rowbit) 1
+#endif
+static uint32_t fm1__leds(uint32_t n)
+{
+    return fm1_led[n] | (fm1_led_dim_div && fm1__dim_frame == 0u ? fm1_led_dim[n] : 0u);
+}
 static volatile struct {
     uint16_t con;                /* the conversion's clock / start delay (FM1_ADC_CON); 0 = analog off */
     uint8_t pend, col, rowbit;   /* a conversion runs for (col, rowbit); rowbit 0 = the pot */
@@ -405,17 +420,19 @@ static void fm1_input_tick(void)
     fm1__sr_word(0xFFFFu ^ (1u << n) ^ (n < 2u ? 1u << (11u + n) : 0u));
     if (n == 0u) {
         uint32_t np = (fm1_an.probe & 1u) + ((fm1_an.probe >> 1) & 1u) + ((fm1_an.probe >> 2) & 1u);
+        if (++fm1__dim_frame >= fm1_led_dim_div)
+            fm1__dim_frame = 0;
         fm1__frame();
         fm1_an.phase = (uint8_t)(fm1_an.phase + 1u >= 2u + np ? 0u : fm1_an.phase + 1u);
     }
     if (fm1_an.con && fm1_an.phase >= 2u) {        /* a probe frame: the row of this phase, through PA10 */
         uint32_t pr = fm1__probe_row(fm1_an.phase);
         if (!pr || (pr == 2u ? n >= FM1_PROBE_COLS : FM1_KEYMAP[pr][n] < 14)) {
-            fm1__led_lines(fm1_led[n]);            /* a button's column, or none: nothing to probe */
+            fm1__led_lines(fm1__leds(n));          /* a button's column, or none: nothing to probe */
             fm1__tick_col = (uint8_t)n;
             return;
         }
-        fm1__led_lines(fm1_led[n] & ~(1u << 2));
+        fm1__led_lines(fm1__leds(n) & ~(1u << 2));
         fm1__pa10_probe(1);
         fm1__row_drive(pr, 0u);                    /* the weakest, whatever DRIVE is: TOP LOW / HIGH were measured so */
         fm1__tick_col = (uint8_t)n;
@@ -426,7 +443,7 @@ static void fm1_input_tick(void)
         fm1_an.pend = 1;
         return;
     }
-    fm1__led_lines(fm1_led[n]);
+    fm1__led_lines(fm1__leds(n));
     fm1__tick_col = (uint8_t)n;
     if (fm1_an.con && fm1_an.phase < 2u) {         /* column n is latched now: sample it until the next tick */
         uint32_t odd = fm1_an.phase, ch, rowbit;
@@ -439,6 +456,8 @@ static void fm1_input_tick(void)
         }
         fm1_an.col = (uint8_t)n;
         fm1_an.rowbit = (uint8_t)rowbit;
+        if (rowbit && !FM1_INPUT_LED_OK(n, rowbit))
+            fm1__led_lines(0);                     /* a held key: no LED current in its column while it is read */
         if (rowbit && fm1_an.drive && !fm1_an.selftest && FM1_INPUT_DRIVE(n, rowbit)) {
             fm1__row_drive(rowbit, fm1_an.drive - 1u);
             fm1_an.driven = 1;

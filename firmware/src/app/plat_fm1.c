@@ -39,19 +39,32 @@ static void led_pos_init(void)
                     led_pos[id] = (uint8_t)((p << 3) | r);
     }
 }
+/* Glow (FoMni's): every button not lit is lit dim, on one scan frame in GLOW_DIV. PLAY has two LEDs: its
+ * red at the button's own position, a green at the keyless matrix position column 8, row PA5: lit, PLAY
+ * shows green */
+#define GLOW_DIV 4u
 void plat_leds(uint32_t buttons, uint32_t keys)
 {
-    uint8_t nl[FM1_NCOL] = {0};
+    uint8_t nl[FM1_NCOL] = {0}, dl[FM1_NCOL] = {0};
     uint32_t i, c;
     for (i = 0; i < NB + NKEYS; i++) {
         uint32_t id = i < NB ? panel.btn[i] : 14u + (i - NB);
         int on = i < NB ? (buttons >> i) & 1u : (keys >> (i - NB)) & 1u;
         uint8_t q = led_pos[id];
-        if (on && q != 0xFF)
+        if (i == B_PLAY)
+            q = (uint8_t)((8u << 3) | 1u);
+        if (q == 0xFF)
+            continue;
+        if (on)
             nl[q >> 3] |= (uint8_t)(1u << (q & 7u));
+        else if (i < NB)
+            dl[q >> 3] |= (uint8_t)(1u << (q & 7u));
     }
-    for (c = 0; c < FM1_NCOL; c++)
+    for (c = 0; c < FM1_NCOL; c++) {
         fm1_led[c] = nl[c];
+        fm1_led_dim[c] = dl[c];
+    }
+    fm1_led_dim_div = GLOW_DIV;
 }
 
 /* MIDI: Felucca's rings carry 4-byte USB-MIDI event packets, byte 0 = cable / CIN */
@@ -84,6 +97,13 @@ void plat_sysex(const uint8_t *d, uint32_t n)          /* d[0] = F0 .. d[n-1] = 
 uint32_t plat_midi_dropped(void) { return mo_dropped; }
 
 /* the analog rows: the scan tick calls this with each sample (main.c's FM1_INPUT_ANALOG) */
+/* the key on this row of this column is open: its column's LEDs may be lit while it is read (fm1_input.h) */
+static int plat_analog_led_ok(uint32_t col, uint32_t rowbit)
+{
+    int id = FM1_KEYMAP[rowbit][col];
+    uint32_t k = id >= 14 ? (uint32_t)id - 14u : 0xFFu;
+    return k >= NKEYS || sn_key[k].st == SN_OPEN;
+}
 static void plat_analog_sample(uint32_t col, uint32_t rowbit, uint32_t v, uint32_t driven)
 {
     int id = FM1_KEYMAP[rowbit][col];

@@ -91,6 +91,7 @@ static struct {
     uint8_t hold;
     uint8_t sung;                      /* a note is sounding (keys, HOLD or MIDI in) */
     uint8_t midi_notes;                /* notes held from MIDI in */
+    uint32_t on[4];                    /* the notes the keys have on in the voice (bit n: note n) */
     uint32_t save_t;                   /* SAVE pressed at (0: not held) */
     uint8_t save_long;                 /* its hold did the reset */
 } ui;
@@ -156,6 +157,7 @@ static void sing_on(int n, uint32_t vel)
 {
     if (n < 0 || n > 127)
         return;
+    ui.on[n >> 5] |= 1u << (n & 31);
     monk_note_on(n, (int)vel);
     plat_midi3(0x90, (uint32_t)n, vel);
 }
@@ -163,6 +165,7 @@ static void sing_off(int n)
 {
     if (n < 0 || n > 127)
         return;
+    ui.on[n >> 5] &= ~(1u << (n & 31));
     monk_note_off(n);
     plat_midi3(0x80, (uint32_t)n, 64);
 }
@@ -190,12 +193,29 @@ static void key_down(uint32_t key, uint32_t vel)
     sing_on(n, vel);
 }
 
+static int key_held_note(int n)       /* a key held now plays note n */
+{
+    uint32_t k;
+    for (k = 0; k < ui.nstack; k++)
+        if (note_of(ui.stack[k]) == n)
+            return 1;
+    return 0;
+}
+
+/* every note on that no key holds and HOLD does not keep goes off (a key's own release, or one missed:
+ * nothing may be left singing on its own) */
+static void release_strays(void)
+{
+    int n;
+    for (n = 0; n < 128; n++)
+        if ((ui.on[n >> 5] >> (n & 31) & 1u) && !key_held_note(n) && !(ui.hold && n == ui.hold_note))
+            sing_off(n);
+}
+
 static void key_up(uint32_t key)
 {
     stack_remove(key);
-    if (ui.hold)
-        return;                        /* HOLD: the note stays (the engine's stack keeps it) */
-    sing_off(note_of(key));
+    release_strays();                  /* HOLD keeps its one note, the latched one */
 }
 
 static void set_hold(int on)
@@ -205,29 +225,17 @@ static void set_hold(int on)
         ui.hold_note = ui.nstack ? (int16_t)note_of(ui.stack[ui.nstack - 1u]) : -1;
         say("HOLD");
     } else {
-        uint32_t k;
-        if (ui.hold_note >= 0) {
-            int still = 0;
-            for (k = 0; k < ui.nstack; k++)
-                if (note_of(ui.stack[k]) == ui.hold_note)
-                    still = 1;
-            if (!still)
-                sing_off(ui.hold_note);
-        }
         ui.hold_note = -1;
+        release_strays();
         say("HOLD OFF");
     }
 }
 
 static void all_off(void)
 {
-    uint32_t k;
-    for (k = 0; k < ui.nstack; k++)
-        sing_off(note_of(ui.stack[k]));
-    if (ui.hold_note >= 0)
-        sing_off(ui.hold_note);
     ui.nstack = 0;
     ui.hold_note = -1;
+    release_strays();
     ui.midi_notes = 0;
     monk_panic();
 }

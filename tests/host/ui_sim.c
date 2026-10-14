@@ -213,6 +213,26 @@ int main(int argc, char **argv)
     step(200);
     CHECK(!monk_ui_active, "HOLD off lets it go");
 
+    /* two keys held when HOLD goes on, both let go, HOLD off: nothing may stay on (the first key's note
+     * used to stay in the voice's note stack and sing once the latched one went) */
+    press(3, 300, 600);
+    press(7, 300, 600);
+    tap(B_PLAY);
+    release(3);
+    release(7);
+    step(100);
+    CHECK(monk_ui_active, "HOLD keeps the latched note");
+    tap(B_PLAY);
+    step(200);
+    CHECK(!monk_ui_active, "HOLD off with two keys: nothing stuck");
+    /* the octave changed while a key is down: its release still lets its note go */
+    press(4, 300, 600);
+    tap(B_OCTUP);
+    release(4);
+    step(200);
+    CHECK(!monk_ui_active, "octave change under a key: nothing stuck");
+    tap(B_OCTDN);
+
     sim_enc[EN_PRESET] = 1;            /* the next singer */
     step(400);
     CHECK(proj.character == 1 && ui.scene == 1, "PRESETS: the fish");
