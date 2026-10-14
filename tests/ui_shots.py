@@ -18,12 +18,17 @@ def load565(p):
     return im
 
 
-shots = sorted(Path(sys.argv[1]).glob("*.565"))
-cols = 4
-sheet = Image.new("RGB", (cols * 250, ((len(shots) + cols - 1) // cols) * 262), (30, 30, 30))
-d = ImageDraw.Draw(sheet)
-for i, s in enumerate(shots):
-    x, y = (i % cols) * 250 + 5, (i // cols) * 262 + 18
-    sheet.paste(load565(s), (x, y))
-    d.text((x, y - 14), s.stem, fill=(220, 220, 220))
-sheet.save(sys.argv[2])
+def main():
+    shots = sorted(Path(sys.argv[1]).glob("*.565"))
+    cols = 4
+    sheet = Image.new("RGB", (cols * 250, ((len(shots) + cols - 1) // cols) * 262), (30, 30, 30))
+    d = ImageDraw.Draw(sheet)
+    for i, s in enumerate(shots):
+        x, y = (i % cols) * 250 + 5, (i // cols) * 262 + 18
+        sheet.paste(load565(s), (x, y))
+        d.text((x, y - 14), s.stem, fill=(220, 220, 220))
+    sheet.save(sys.argv[2])
+
+
+if __name__ == "__main__":
+    main()

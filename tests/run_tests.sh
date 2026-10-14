@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # MONK-1 host tests: the maths, the platform pieces kept from Felucca / FoMni, Velo's sensing, the
 # voice against upstream MonkSynth (MONKSYNTH_DSP: its dsp/ directory; default ../../monksynth-ios/dsp),
-# the characters against the iOS port's frames, and the update path against the package (needs ./build.sh).
+# the characters against the iOS port's frames, the emulator's build, and the update path against the package (needs ./build.sh).
 #   tests/run_tests.sh
 set -u
 cd "$(dirname "$0")/.."
@@ -39,6 +39,11 @@ run face sh -c "$PY tools/gen_art.py $OUT/gen/art.h >/dev/null && mkdir -p $OUT/
     $OUT/face_test $OUT/face && $PY tests/face_compare.py $OUT/face"
 run ui sh -c "mkdir -p $OUT/ui && $CC -O1 -std=gnu99 -w -DOM_HOST -Ifirmware/src -Ifirmware/hal -I$OUT/gen -Ibuild/gen \
     -o $OUT/ui_sim tests/host/ui_sim.c firmware/src/dsp/monk.c -lm && $OUT/ui_sim $OUT/ui"
+if command -v emcc >/dev/null 2>&1; then
+    run web sh web/emu/build.sh
+else
+    echo "  skip web (no Emscripten: the emulator, web/emu/build.sh)"
+fi
 run storage sh -c "$CC -O2 -o $OUT/storage_test tests/storage_test.c && $OUT/storage_test"
 if [ -f build/monk.fwsc ]; then
     run ota-entry sh -c "$CC -o $OUT/ota_test tests/ota_test.c && $OUT/ota_test build/monk.fwsc"
