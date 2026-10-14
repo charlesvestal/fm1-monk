@@ -11,6 +11,13 @@ The keys feel how they are played, without hardware changes, by way of
 and leaning on a held key moves the vowel (or bends the pitch, or both), counted from where the key
 rests. Velocity and aftertouch on an FM-1.
 
+![Jerry the monk singing](docs/img/screen-singing.png) ![Philip the unicorn](docs/img/screen-unicorn.png) ![Snider](docs/img/screen-punk.png)
+
+- **Try it in your browser** (no FM-1 needed): <https://charlesvestal.github.io/fm1-monk/emu/>
+- **Install it** (Chrome or Edge, with the FM-1 plugged in): <https://charlesvestal.github.io/fm1-monk/install/>
+- **Read the manual**: <https://charlesvestal.github.io/fm1-monk/manual/> (source: [docs/MANUAL.md](docs/MANUAL.md))
+- **Download the firmware file**: [releases](https://github.com/charlesvestal/fm1-monk/releases)
+
 MonkSynth is offered completely free of charge. If you enjoy it, you are kindly requested to make a
 donation at [savetibet.org](https://www.savetibet.org).
 
