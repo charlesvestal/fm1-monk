@@ -25,6 +25,7 @@ void project_defaults(void)
     proj.at_route = MK_AT_VOWEL;
     proj.at_depth = 50;                  /* the Schwung port's default */
     proj.p_sens = 50;
+    proj.vel_sens = 50;
     for (c = 0; c < ART_N; c++)
         project_reset_character(c);
 }
@@ -32,10 +33,10 @@ void project_defaults(void)
 static int project_valid(void)
 {
     uint32_t c, k;
-    if (proj.magic != PROJ_MAGIC || proj.format != PROJ_FORMAT)
+    if (proj.magic != PROJ_MAGIC || (proj.format != PROJ_FORMAT && proj.format != 2u))
         return 0;
     if (proj.character >= ART_N || proj.octave > 4u || proj.at_route >= MK_NAT || proj.at_depth > 100u ||
-        proj.p_sens > 100u)
+        proj.p_sens > 100u || proj.vel_sens > 100u)
         return 0;
     for (c = 0; c < ART_N; c++)
         for (k = 0; k < MK_NPARAM; k++)
@@ -49,8 +50,13 @@ int project_load(void)
     int n;
     memset(&proj, 0, sizeof proj);
     n = plat_store_load(OBJ_PROJ, &proj, sizeof proj);
-    if (n >= 8 && project_valid())
+    if (n >= 8 && project_valid()) {
+        if (proj.format == 2u) {         /* before VELOCITY came back */
+            proj.format = PROJ_FORMAT;
+            proj.vel_sens = 50;
+        }
         return 0;
+    }
     project_defaults();
     return -1;
 }
@@ -62,7 +68,7 @@ void project_apply(void)
     uint32_t k;
     for (k = 0; k < MK_NPARAM; k++)
         monk_param((int)k, proj.p[proj.character][k]);
-    monk_touch(proj.at_route, (float)proj.at_depth * 0.01f, 0.0f);   /* no velocity: the level is the knob's */
+    monk_touch(proj.at_route, (float)proj.at_depth * 0.01f, (float)proj.vel_sens * 0.01f);
 }
 
 /* Velo's sensing as its notes leave it (notes/01-lab.md there): the driven reading at DRIVE 2, the

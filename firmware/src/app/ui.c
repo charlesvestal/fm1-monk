@@ -2,8 +2,8 @@
 /* MONK-1 UI. Part of the unity build (after gfx.c, sense.c, project.c, inflate.c and face.c).
  *
  *   keys           sing (one voice: the newest key held sounds, letting go falls back to the one
- *                  under it). Pressing harder on a held key (the driven reading: Velo's sensing)
- *                  moves the vowel, or bends, or both (TOUCH: PRESSURE, DEPTH, SENSITIVE)
+ *                  under it). How hard a key lands sets its level (Velocity); pressing harder on a
+ *                  held key moves the vowel, or bends, or both (Pressure, Depth, Sensitive): Velo's sensing
  *   PRESETS        the singer: twelve characters, each with its voice, each remembering its settings
  *   ALGORITHM      the vowel (the knob everyone plays with)
  *   page buttons   a set of knobs each, as Polly: HOME Sing, EDIT Choir, LFO Vibrato, FX Echo, ENV Envelope,
@@ -22,23 +22,23 @@
  * channel), CC 1 vowel, 5 glide, 7 level, 12 echo, 13 head size, aftertouch, CC 123 all off. */
 
 enum { PG_SING, PG_CHOIR, PG_VIB, PG_ECHO, PG_ENV, PG_TOUCH, NPAGES };
-enum { T_ROUTE = 100, T_DEPTH, T_SENS, T_NONE = 255 };
+enum { T_ROUTE = 100, T_DEPTH, T_SENS, T_VEL, T_NONE = 255 };
 static const char *const PAGE_NAME[NPAGES] = {"Sing", "Choir", "Vibrato", "Echo", "Envelope", "Touch"};
 static const uint8_t PAGE_P[NPAGES][4] = {
     {MK_VOWEL, MK_HEAD, MK_BREATH, MK_GLIDE},
     {MK_VOICES, MK_DETUNE, MK_SPREAD, MK_LEVEL},
-    {MK_VIBRATO, MK_VIBRATE, T_NONE, T_NONE},
+    {MK_VIBRATO, MK_VIBRATE, MK_TUNE, T_NONE},
     {MK_DELAY, MK_DELAYRATE, T_NONE, T_NONE},
     {MK_ATTACK, MK_DECAY, MK_SUSTAIN, MK_RELEASE},
-    {T_ROUTE, T_DEPTH, T_SENS, MK_TUNE},
+    {T_ROUTE, T_DEPTH, T_SENS, T_VEL},
 };
 static const char *const PAGE_LABEL[NPAGES][4] = {
     {"Vowel", "Head", "Breath", "Glide"},
     {"Voices", "Detune", "Spread", "Level"},
-    {"Depth", "Rate", 0, 0},
+    {"Depth", "Rate", "Tune", 0},
     {"Amount", "Time", 0, 0},
     {"Attack", "Decay", "Sustain", "Release"},
-    {"Pressure", "Depth", "Sensitive", "Tune"},
+    {"Pressure", "Depth", "Sensitive", "Velocity"},
 };
 /* the page buttons: one set of knobs each, and each set one button's; a button opens its first page, SELECT
  * turns its pages (n > 1: the tag's dots) */
@@ -361,6 +361,7 @@ static float pval(uint32_t page, uint32_t i)
     case T_ROUTE: return (float)proj.at_route / (float)(MK_NAT - 1);
     case T_DEPTH: return (float)proj.at_depth * 0.01f;
     case T_SENS: return (float)proj.p_sens * 0.01f;
+    case T_VEL: return (float)proj.vel_sens * 0.01f;
     default: return cur_p()[id];
     }
 }
@@ -414,6 +415,7 @@ static void turn(uint32_t i, int32_t e)
     case T_ROUTE: proj.at_route = (uint8_t)clamp((int32_t)proj.at_route + (e > 0 ? 1 : -1), 0, MK_NAT - 1); break;
     case T_DEPTH: proj.at_depth = (uint8_t)clamp((int32_t)proj.at_depth + e, 0, 100); break;
     case T_SENS: proj.p_sens = (uint8_t)clamp((int32_t)proj.p_sens + e, 0, 100); break;
+    case T_VEL: proj.vel_sens = (uint8_t)clamp((int32_t)proj.vel_sens + e, 0, 100); break;
     default: {
         float v = p[id] + step * (float)e;
         if (id == MK_VOICES || id == MK_TUNE)   /* on the steps */
@@ -424,7 +426,7 @@ static void turn(uint32_t i, int32_t e)
     }
     }
     if (id >= T_ROUTE && id != T_NONE)
-        monk_touch(proj.at_route, (float)proj.at_depth * 0.01f, 0.0f);
+        monk_touch(proj.at_route, (float)proj.at_depth * 0.01f, (float)proj.vel_sens * 0.01f);
     ui.touched = (int8_t)i;
     menu_show(2500u);
     mark_dirty();
