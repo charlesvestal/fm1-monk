@@ -84,3 +84,37 @@ flashes. Package identity `FM-1_5` (dev builds `FM-1_500`), USB name "MONK-1 FM-
   Instruments, GPL-3.0-only), by way of [FoMni](https://github.com/charlesvestal/fm1-fomni) and Velo.
 
 GPL-3.0-only.
+
+## How the keys sense velocity and aftertouch
+
+The FM-1's keys are a diode matrix of rubber domes, each with a carbon pill that closes the contact.
+Stock firmware only asks whether a key is down. The pill's resistance falls as it is pressed harder,
+and two of the matrix's row lines (PA7, PA8) are also ADC inputs, so the firmware can measure the
+press (`firmware/src/app/sense.c`, from [Velo](https://github.com/charlesvestal/fm1-velocity); its
+`notes/01-lab.md` has the measurements).
+
+- **Reading the pill.** Each key is sampled every ~2.2 ms. Against the row's 10k pull-up, a seated
+  key reads mostly the matrix diode (~0.6 V), and pressing harder moves it only 10–20 counts.
+  So once a key has been touched, every other sample is taken with its row driven high by the pin's
+  weak GPIO driver instead. That driver becomes the upper resistor of the divider, and the reading
+  less the diode's share is the pill's resistance. The open, touch, seated and lifted states still
+  run on the pulled-up samples.
+- **Velocity.** The dome snaps, so every press lands within a sample or two whatever its speed.
+  What tells a hard hit from a soft one is how deep the key sits just after landing. The velocity is
+  the lowest driven reading in the first two driven samples after the touch (WAIT 2, 6.6 ms), on a
+  log scale: conductive rubber's resistance falls as a power of the force, so its log is linear in
+  the log of the force, placed between a floor (hardest) and a ceiling (lightest press that
+  seats). Velo can also learn each key's own floor and ceiling from its landings; that is off here.
+- **Aftertouch** is pressing harder than the key rests. A key keeps settling for a while after it
+  lands, so the zero follows the reading down for 250 ms and then creeps after it, and comes back up
+  at once when the key is eased (`ui.c` `pressure()`). The lean is the drop in the pill's
+  resistance below that rest, in octaves; Touch: Sensitive sets how many make full aftertouch. Every
+  held key's goes out as polyphonic aftertouch.
+- **The top row** (the seven keys at the right end, C♯ to G) is on PA6, which has no ADC. Its
+  velocity comes from a probe through the LED line PA10 with PA6 driven high, which saturates on
+  firm presses; those keys have no aftertouch.
+- **LEDs.** The button LEDs share the matrix with the keys, and a lit one shifts its column's
+  readings, so while a key is down the LED at its matrix position stays dark when its column is
+  sampled (`FM1_INPUT_LED_OK`).
+
+`tests/host/sense_test.c` runs the sensing on synthetic press curves.
