@@ -24,7 +24,7 @@ void project_defaults(void)
     proj.page = 0;
     proj.at_route = MK_AT_VOWEL;
     proj.at_depth = 50;                  /* the Schwung port's default */
-    proj.vel_sens = 50;
+    proj.p_sens = 50;
     for (c = 0; c < ART_N; c++)
         project_reset_character(c);
 }
@@ -35,7 +35,7 @@ static int project_valid(void)
     if (proj.magic != PROJ_MAGIC || proj.format != PROJ_FORMAT)
         return 0;
     if (proj.character >= ART_N || proj.octave > 4u || proj.at_route >= MK_NAT || proj.at_depth > 100u ||
-        proj.vel_sens > 100u)
+        proj.p_sens > 100u)
         return 0;
     for (c = 0; c < ART_N; c++)
         for (k = 0; k < MK_NPARAM; k++)
@@ -62,12 +62,12 @@ void project_apply(void)
     uint32_t k;
     for (k = 0; k < MK_NPARAM; k++)
         monk_param((int)k, proj.p[proj.character][k]);
-    monk_touch(proj.at_route, (float)proj.at_depth * 0.01f, (float)proj.vel_sens * 0.01f);
+    monk_touch(proj.at_route, (float)proj.at_depth * 0.01f, 0.0f);   /* no velocity: the level is the knob's */
 }
 
 /* Velo's sensing as its notes leave it (notes/01-lab.md there): the driven reading at DRIVE 2, the
  * deeper of two samples (WAIT 2), the log scale, the top row through the PA10 probe; the
- * calibration off. The pressure: pressing harder than the note landed, 127 at 64 counts below it. */
+ * calibration off. (The pressure is ui.c's: from where the key rests.) */
 void sense_setup(void)
 {
     sn_cfg.touch = 900;

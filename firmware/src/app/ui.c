@@ -2,8 +2,8 @@
 /* MONK-1 UI. Part of the unity build (after gfx.c, sense.c, project.c, inflate.c and face.c).
  *
  *   keys           sing (one voice: the newest key held sounds, letting go falls back to the one
- *                  under it). The velocity sets the level (VELOCITY on TOUCH); pressing harder on a
- *                  held key (the driven reading: Velo's sensing) moves the vowel, or bends, or both
+ *                  under it). Pressing harder on a held key (the driven reading: Velo's sensing)
+ *                  moves the vowel, or bends, or both (TOUCH: PRESSURE, DEPTH, SENSITIVE)
  *   PRESETS        the singer: twelve characters, each with its voice, each remembering its settings
  *   ALGORITHM      the vowel (the knob everyone plays with)
  *   KNOB 1-4       the page's four values       SELECT / EDIT   the page     HOME   SING
@@ -15,25 +15,25 @@
  * The screen is the character on its stage (face.c): the mouth follows the vowel, in frames, and
  * swells with loudness; idle, it blinks and shuffles through its vowels as the iOS one does. Turning
  * a knob brings up the strip of four values at the bottom; a new singer or page, its name at the top.
- * USB MIDI out: the notes (channel 1) with their velocity and polyphonic aftertouch. In: notes (any
+ * USB MIDI out: the notes (channel 1) with the keys' velocity, and polyphonic aftertouch. In: notes (any
  * channel), CC 1 vowel, 5 glide, 7 level, 12 echo, 13 head size, aftertouch, CC 123 all off. */
 
 enum { PG_SING, PG_CHOIR, PG_AIR, PG_ENV, PG_TOUCH, NPAGES };
-enum { T_ROUTE = 100, T_DEPTH, T_VEL };
+enum { T_ROUTE = 100, T_DEPTH, T_SENS };
 static const char *const PAGE_NAME[NPAGES] = {"SING", "CHOIR", "AIR", "ENVELOPE", "TOUCH"};
 static const uint8_t PAGE_P[NPAGES][4] = {
     {MK_VOWEL, MK_HEAD, MK_BREATH, MK_GLIDE},
     {MK_VOICES, MK_DETUNE, MK_SPREAD, MK_LEVEL},
     {MK_VIBRATO, MK_VIBRATE, MK_DELAY, MK_DELAYRATE},
     {MK_ATTACK, MK_DECAY, MK_SUSTAIN, MK_RELEASE},
-    {T_ROUTE, T_DEPTH, T_VEL, MK_TUNE},
+    {T_ROUTE, T_DEPTH, T_SENS, MK_TUNE},
 };
 static const char *const PAGE_LABEL[NPAGES][4] = {
     {"VOWEL", "HEAD", "BREATH", "GLIDE"},
     {"VOICES", "DETUNE", "SPREAD", "LEVEL"},
     {"VIBRATO", "RATE", "ECHO", "TIME"},
     {"ATTACK", "DECAY", "SUSTAIN", "RELEASE"},
-    {"PRESSURE", "DEPTH", "VELOCITY", "TUNE"},
+    {"PRESSURE", "DEPTH", "SENSITIVE", "TUNE"},
 };
 static const char *const ROUTE_NAME[MK_NAT] = {"VOWEL", "PITCH", "BOTH", "BOTH INV"};
 
@@ -211,30 +211,53 @@ static uint32_t top_vel(uint32_t key)
     return 100;
 }
 
-/* pressure: every 5 ms, each held analog key's (smoothed over ~30 ms: a lift is a few fast samples
- * and must not register); the sounding key's drives the voice, every key's goes out as poly AT */
-static uint16_t at_smooth[NKEYS];
-static uint8_t at_sent[NKEYS];
+/* pressure: every 5 ms, each held analog key's; the sounding key's drives the voice, every key's goes
+ * out as poly AT. Counted from where the key RESTS, not from where it landed: a key goes on settling
+ * after the note (measured: resting on a key read 100 within 150 ms when the zero was the landing).
+ * So the zero follows the driven reading down for P_SETTLE ms, then creeps after it (a few seconds),
+ * and comes back up at once when the key is eased. The lean is the pill's resistance below its rest on
+ * a log scale (Velo's: the reading less the diode, SN_DBASE): P_DEAD of an octave is noise, P_SPAN more (SENSITIVE)
+ * is 127 (a light rest to a firm press measured ~0.7 octave at DRIVE 2). Smoothed over ~30 ms. */
+#define P_SETTLE 250u                  /* ms */
+#define P_DEAD 0.04f                   /* octaves of resistance */
+#define P_SPAN(s) (0.8f * (1.0f - 0.85f * (s)))   /* SENSITIVE 0..1: 0.8 .. 0.12 octave; 50: 0.46 */
+static float p_base[NKEYS], p_s[NKEYS];
+static uint32_t p_t0[NKEYS];
+static uint8_t at_sent[NKEYS], p_on[NKEYS];
 static uint32_t at_t;
 static uint8_t at_voice;
 static void pressure(void)
 {
-    uint32_t i, top = ui.nstack ? ui.stack[ui.nstack - 1u] : 0xFFu;
+    uint32_t i, now = plat_ms(), top = ui.nstack ? ui.stack[ui.nstack - 1u] : 0xFFu;
     uint8_t pv = 0;
-    if (plat_ms() - at_t < 5u)
+    if (now - at_t < 5u)
         return;
-    at_t = plat_ms();
+    at_t = now;
     for (i = 0; i < NKEYS; i++) {
+        float d, lean, x;
         uint8_t p;
         if (!sense_is_analog(i))
             continue;
-        if (sn_key[i].st != SN_DOWN) {
-            at_smooth[i] = 0;
+        if (sn_key[i].st != SN_DOWN || !sn_key[i].dn) {
+            p_on[i] = 0;
+            p_s[i] = 0.0f;
             at_sent[i] = 0;
             continue;
         }
-        at_smooth[i] = (uint16_t)(at_smooth[i] + ((int32_t)sense_pressure(i) * 16 - (int32_t)at_smooth[i]) / 6);
-        p = (uint8_t)(at_smooth[i] / 16u);
+        d = (float)(sn_key[i].d > SN_DBASE + 1u ? sn_key[i].d - SN_DBASE : 1u);
+        if (!p_on[i]) {
+            p_on[i] = 1;
+            p_base[i] = d;
+            p_t0[i] = now;
+        }
+        if (d > p_base[i])
+            p_base[i] = d;                                     /* eased off: that is the rest now */
+        else
+            p_base[i] += (d - p_base[i]) * (now - p_t0[i] < P_SETTLE ? 0.25f : 0.0008f);
+        lean = fm_log2f(p_base[i] / d);
+        x = fm_clampf((lean - P_DEAD) / P_SPAN((float)proj.p_sens * 0.01f), 0.0f, 1.0f);
+        p_s[i] += (x - p_s[i]) * 0.17f;
+        p = (uint8_t)(p_s[i] * 127.0f + 0.5f);
         if (i == top)
             pv = p;
         if (p != at_sent[i]) {
@@ -298,7 +321,7 @@ static float pval(uint32_t page, uint32_t i)
     switch (id) {
     case T_ROUTE: return (float)proj.at_route;
     case T_DEPTH: return (float)proj.at_depth * 0.01f;
-    case T_VEL: return (float)proj.vel_sens * 0.01f;
+    case T_SENS: return (float)proj.p_sens * 0.01f;
     default: return cur_p()[id];
     }
 }
@@ -348,7 +371,7 @@ static void turn(uint32_t i, int32_t e)
     switch (id) {
     case T_ROUTE: proj.at_route = (uint8_t)clamp((int32_t)proj.at_route + (e > 0 ? 1 : -1), 0, MK_NAT - 1); break;
     case T_DEPTH: proj.at_depth = (uint8_t)clamp((int32_t)proj.at_depth + e, 0, 100); break;
-    case T_VEL: proj.vel_sens = (uint8_t)clamp((int32_t)proj.vel_sens + e, 0, 100); break;
+    case T_SENS: proj.p_sens = (uint8_t)clamp((int32_t)proj.p_sens + e, 0, 100); break;
     default: {
         float v = p[id] + step * (float)e;
         if (id == MK_VOICES || id == MK_TUNE)   /* on the steps */
@@ -359,7 +382,7 @@ static void turn(uint32_t i, int32_t e)
     }
     }
     if (id >= T_ROUTE)
-        monk_touch(proj.at_route, (float)proj.at_depth * 0.01f, (float)proj.vel_sens * 0.01f);
+        monk_touch(proj.at_route, (float)proj.at_depth * 0.01f, 0.0f);
     ui.touched = (int8_t)i;
     ui.strip_until = plat_ms() + 2500u;
     ui.strip_dirty = 1;

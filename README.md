@@ -6,9 +6,9 @@ an homage to the Delay Lama plug-in by AudioNerdz, 2002), with the twelve charac
 [its iOS port](https://github.com/charlesvestal/monksynth-ios). Each one sings in its own voice on
 its own stage; the mouth follows the vowel, in frames, as the original's sprite sheet did.
 
-The keys feel how they are played, without hardware changes, by way of
-[Velo](https://github.com/charlesvestal/fm1-velocity)'s sensing: velocity sets the level, and
-pressing harder on a held key moves the vowel (or bends the pitch, or both).
+The keys feel how hard they are held, without hardware changes, by way of
+[Velo](https://github.com/charlesvestal/fm1-velocity)'s sensing: leaning on a held key moves the
+vowel (or bends the pitch, or both), counted from where the key rests.
 
 MonkSynth is offered completely free of charge. If you enjoy it, you are kindly requested to make a
 donation at [savetibet.org](https://www.savetibet.org).
@@ -35,9 +35,9 @@ The pages:
 | CHOIR | VOICES (unison, 1–10) | DETUNE | SPREAD (the voices' head sizes) | LEVEL |
 | AIR | VIBRATO | RATE | ECHO | TIME |
 | ENVELOPE | ATTACK | DECAY | SUSTAIN | RELEASE |
-| TOUCH | PRESSURE (vowel, pitch, both, both inverted) | DEPTH | VELOCITY | TUNE |
+| TOUCH | PRESSURE (vowel, pitch, both, both inverted) | DEPTH | SENSITIVE (how far a lean goes) | TUNE |
 
-USB MIDI out: the notes on channel 1 with their velocity, and polyphonic aftertouch. In: notes (any
+USB MIDI out: the notes on channel 1 (with the keys' velocity), and polyphonic aftertouch. In: notes (any
 channel), CC 1 vowel, 5 glide, 7 level, 12 echo, 13 head size, aftertouch, CC 123 all notes off.
 
 ## How it is made

@@ -11,7 +11,7 @@
 #define OM_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x4B4E4F4Du           /* "MONK" */
-#define PROJ_FORMAT 1u
+#define PROJ_FORMAT 2u                   /* 2: SENSITIVITY in VELOCITY's place */
 
 typedef struct {
     uint32_t magic, format;
@@ -20,7 +20,7 @@ typedef struct {
     uint8_t page;
     uint8_t at_route;                    /* MK_AT_*: where pressure goes */
     uint8_t at_depth;                    /* 0..100: how far full pressure moves the vowel */
-    uint8_t vel_sens;                    /* 0..100: how much velocity changes the level */
+    uint8_t p_sens;                      /* 0..100: pressure's sensitivity (how far a lean goes for 127) */
     uint8_t rsv[10];
     float p[ART_N][MK_NPARAM];           /* every character's voice as last left (0..1) */
 } project_t;
