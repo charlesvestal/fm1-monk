@@ -193,9 +193,12 @@ int main(int argc, char **argv)
     tap(B_ENV);
     CHECK(proj.page == PG_ENV, "ENV: the envelope page");
     shot(dir, "06_env");
-    sim_enc[EN_SELECT] = 1;
-    step(100);
-    CHECK(proj.page == PG_TOUCH, "SELECT: the next page");
+    tap(B_GLO);
+    CHECK(proj.page == PG_TOUCH, "GLO: the touch page");
+    tap(B_FX);
+    CHECK(proj.page == PG_ECHO, "FX: the echo page");
+    shot(dir, "06b_echo");
+    tap(B_GLO);
     sim_enc[EN_K1] = 1;
     step(100);
     CHECK(proj.at_route == MK_AT_PITCH, "PRESSURE: pitch");

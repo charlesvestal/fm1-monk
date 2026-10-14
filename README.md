@@ -21,21 +21,22 @@ donation at [savetibet.org](https://www.savetibet.org).
 | pressing harder | moves the vowel (TOUCH: PRESSURE, DEPTH) |
 | PRESETS | the singer: Jerry the monk, Guppo, Philip, Suze, Gerald, Bess, EeOo, Snider, Fipsy, Peppo, Marley, Razor. Each loads its voice and remembers your changes |
 | ALGORITHM | the vowel, on any page |
-| KNOB 1–4 | the page's four values. SELECT or EDIT turns the page; HOME is SING; ENV is ENVELOPE; LFO and FX are AIR |
+| page buttons | a set of knobs each: HOME Sing, EDIT Choir, LFO Vibrato, FX Echo, ENV Envelope, GLO Touch. The menu (the button, the page, whose the knobs are, the knobs, the encoders) comes up over the singer when a page button, a knob or PRESETS is touched, and goes after a few seconds |
+| KNOB 1–4 | the page's knobs |
 | OCT− / OCT+ | octave |
 | PLAY | HOLD: the note stays after the key; another key takes over |
-| SAVE | saves now (it saves by itself a few seconds after the last change) |
-| GLO twice | this singer's voice back to how it came |
+| SAVE | saves now (it saves by itself a few seconds after the last change); held 1.5 s: this singer's voice back to how it came |
 
 The pages:
 
-| | 1 | 2 | 3 | 4 |
-|---|---|---|---|---|
-| SING | VOWEL | HEAD (size of the vocal tract) | BREATH | GLIDE |
-| CHOIR | VOICES (unison, 1–10) | DETUNE | SPREAD (the voices' head sizes) | LEVEL |
-| AIR | VIBRATO | RATE | ECHO | TIME |
-| ENVELOPE | ATTACK | DECAY | SUSTAIN | RELEASE |
-| TOUCH | PRESSURE (vowel, pitch, both, both inverted) | DEPTH | SENSITIVE (how far a lean goes) | TUNE |
+| | button | 1 | 2 | 3 | 4 |
+|---|---|---|---|---|---|
+| Sing | HOME | Vowel | Head (size of the vocal tract) | Breath | Glide |
+| Choir | EDIT | Voices (unison, 1–10) | Detune | Spread (the voices' head sizes) | Level |
+| Vibrato | LFO | Depth | Rate | | |
+| Echo | FX | Amount | Time | | |
+| Envelope | ENV | Attack | Decay | Sustain | Release |
+| Touch (all singers) | GLO | Pressure (vowel, pitch, both, both inverted) | Depth | Sensitive (how far a lean goes) | Tune |
 
 USB MIDI out: the notes on channel 1 (with the keys' velocity), and polyphonic aftertouch. In: notes (any
 channel), CC 1 vowel, 5 glide, 7 level, 12 echo, 13 head size, aftertouch, CC 123 all notes off.
