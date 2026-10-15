@@ -10,7 +10,7 @@ Velocity and aftertouch from the FM-1's own keys, with no hardware changes, by w
 [Velo](https://github.com/charlesvestal/fm1-velocity)'s sensing: velocity sets each note's level,
 aftertouch moves the vowel (or bends the pitch, or both), counted from where the key rests.
 
-![Jerry the monk singing](docs/img/screen-singing.png) ![Philip the unicorn](docs/img/screen-unicorn.png) ![Snider](docs/img/screen-punk.png)
+![Jerry the monk singing, mouth wide open, in front of mountains and prayer flags](docs/img/screen-singing.png) ![Philip the unicorn singing in front of a rainbow](docs/img/screen-unicorn.png) ![Snider the punk singing between two speakers](docs/img/screen-punk.png)
 
 - **Try it in your browser** (no FM-1 needed): <https://charlesvestal.github.io/fm1-monk/emu/>
 - **Install it** (Chrome or Edge, with the FM-1 plugged in): <https://charlesvestal.github.io/fm1-monk/install/>

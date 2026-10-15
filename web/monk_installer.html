@@ -10,7 +10,7 @@
 <title>MONK-1 installer</title>
 <style>
   /* MONK-1's cream and saffron, as its screen and the site */
-  :root { --bg: #faf4e8; --fg: #48392f; --dim: #706254; --accent: #b5600c; --sheet: #ece4d4; color-scheme: light; }
+  :root { --bg: #faf4e8; --fg: #48392f; --dim: #706254; --accent: #9c5208; --sheet: #ece4d4; color-scheme: light; }
   body { margin: 0; background: var(--bg); color: var(--fg);
          font: 16px/1.6 "Helvetica Neue", Helvetica, Arial, sans-serif; }
   main { max-width: 520px; margin: 0 auto; padding: 48px 16px; }
@@ -19,19 +19,24 @@
   p { margin: 0 0 16px; }
   button { font: inherit; font-weight: 700; background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 8px 24px; cursor: pointer; }
   button:disabled { opacity: .3; cursor: default; }
-  #status { margin-top: 16px; min-height: 1.6em; }
+  #status, #alert { margin-top: 16px; min-height: 1.6em; }
+  #alert:empty, #stockmsg:empty { display: none; }
+  #alert { font-weight: 700; }
+  :focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  label { display: block; }
   .small { color: var(--dim); font-size: 13px; }
-  progress { width: 100%; height: 4px; margin-top: 16px; accent-color: #b5600c; }
+  progress { width: 100%; height: 4px; margin-top: 16px; accent-color: var(--accent); }
   pre { color: var(--dim); font-size: 12px; white-space: pre-wrap; margin-top: 16px; }
   h2 { font-size: 16px; font-weight: 700; margin: 40px 0 12px; padding-top: 8px; border-top: 2px solid var(--fg); }
   ol { margin: 0 0 16px; padding-left: 20px; }
   input[type=file] { font: inherit; font-size: 13px; color: var(--dim); max-width: 100%; }
   .site { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem 1.2rem; margin: 0 0 1.6rem; padding-bottom: .5rem; border-bottom: 2px solid var(--fg); }
   .site .home { font-size: 1.1rem; font-weight: 700; letter-spacing: .04em; color: var(--fg); text-decoration: none; }
-  .site .home:hover { color: #b5600c; background: none; }
+  .site .home:hover { color: var(--accent); background: none; }
   .site nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: .2rem 1rem; font-size: .92rem; }
-  .site nav a { color: var(--fg); text-decoration-color: #b5600c; text-underline-offset: 3px; }
-  .site nav a[aria-current] { text-decoration: none; color: #b5600c; }
+  .site nav a { color: var(--fg); text-decoration-color: var(--accent); text-underline-offset: 3px; }
+  .site nav a[aria-current] { text-decoration: none; color: var(--accent); }
 </style>
 </head>
 <body>
@@ -46,31 +51,34 @@
   <p class="small"><span data-t="brick"></span>
     <a href="../manual/#recovering-an-fm-1-that-won-t-start" style="color:inherit" data-t="bricklink"></a></p>
   <p class="small" data-t="back"></p>
-  <p class="small"><a href="https://www.m-vave.com/download" target="_blank" rel="noopener" style="color:inherit">www.m-vave.com/download</a></p>
+  <p class="small"><a href="https://www.m-vave.com/download" target="_blank" rel="noopener" style="color:inherit">www.m-vave.com/download<span class="sr" data-t="newtab"></span></a></p>
   <p><button id="go" disabled data-t="install"></button></p>
-  <progress id="bar" max="100" value="0"></progress>
-  <p id="status"></p>
+  <progress id="bar" max="100" value="0" aria-labelledby="barlabel"></progress><span id="barlabel" hidden data-t="progress"></span>
+  <p id="status" role="status"></p>
+  <p id="alert" role="alert"></p>
   <pre id="log"></pre>
   <h2 data-t="stockh"></h2>
   <p class="small" data-t="stockwhy"></p>
   <ol class="small">
     <li><span data-t="stock1"></span> <a id="stocklink" href="https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc" style="color:inherit">FM-1.fwsc</a></li>
-    <li><span data-t="stock2"></span><br><input type="file" id="stockfile" accept=".fwsc"></li>
+    <li><label for="stockfile" data-t="stock2"></label><input type="file" id="stockfile" accept=".fwsc">
+      <p id="stockmsg" aria-live="polite"></p></li>
     <li data-t="stock3"></li>
   </ol>
   <p><button id="stockgo" disabled data-t="stockinstall"></button></p>
   <p><a href="../" style="color:inherit" data-t="manual"></a></p>
-  <p class="small">MONK-1 is built on Felucca by Leo Kuroshita (@kurogedelic), <a href="https://hugelton.com" target="_blank" rel="noopener" style="color:inherit">Hügelton Instruments</a>,
+  <p class="small">MONK-1 is built on Felucca by Leo Kuroshita (@kurogedelic), <a href="https://hugelton.com" target="_blank" rel="noopener" style="color:inherit">Hügelton Instruments<span class="sr" data-t="newtab"></span></a>,
     by way of X0X, FoMni and Velo. The voice is MonkSynth by Jonathan Taylor (MIT); the singers come from MonkSynth for iOS.<br>
     Fonts: Barlow Semi Condensed (SIL OFL 1.1). M-VAVE and FM-1 are trademarks of their respective owners.<br>
-    <span data-t="license"></span> <a href="https://github.com/charlesvestal/fm1-monk" target="_blank" rel="noopener" style="color:inherit">github.com/charlesvestal/fm1-monk</a></p>
+    <span data-t="license"></span> <a href="https://github.com/charlesvestal/fm1-monk" target="_blank" rel="noopener" style="color:inherit">github.com/charlesvestal/fm1-monk<span class="sr" data-t="newtab"></span></a></p>
 </main>
 <script type="module">
 /*LIB*/
 const $ = (id) => document.getElementById(id);
 const TEXT = {
   ja: {
-    intro: "FM-1 を USB で接続してください。（Chrome か Edge で使えます）",
+    intro: "FM-1 を USB で接続してください。（Chrome か Edge で使えます。ブラウザが MIDI 機器の使用を確認してきたら、許可してください）",
+    progress: "進み具合", newtab: "（新しいタブで開きます）", percent: "%",
     warn: "書き込み中は USB を抜かないでください。",
     install: "インストール", other: "English",
     manual: "MONK-1 のページへ",
@@ -104,7 +112,8 @@ const TEXT = {
     license: "GPL-3.0、無保証。ソース:",
   },
   en: {
-    intro: "Connect the FM-1 by USB. (Works in Chrome or Edge.)",
+    intro: "Connect the FM-1 by USB. (Works in Chrome or Edge. The browser asks whether this page may use MIDI devices: allow it.)",
+    progress: "Install progress", newtab: " (opens in a new tab)", percent: " percent",
     warn: "Do not unplug the USB cable while writing.",
     install: "Install", other: "日本語",
     manual: "Back to MONK-1",
@@ -145,12 +154,30 @@ function applyLang() {
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-t]").forEach((e) => { e.textContent = t(e.dataset.t); });
   $("lang").textContent = t("other");
-  if (lastKey) $("status").textContent = t(lastKey) + lastArg;
+  $("lang").lang = lang === "ja" ? "en" : "ja";
+  if (lastKey) show(t(lastKey) + lastArg);
 }
 $("lang").addEventListener("click", () => { lang = lang === "ja" ? "en" : "ja"; applyLang(); });
 applyLang();
-const sayK = (k, arg = "") => { lastKey = k; lastArg = arg; $("status").textContent = t(k) + arg; };
-const say = (txt) => { lastKey = null; $("status").textContent = txt; };
+/* the current step in words: role="status" (polite); a failure: role="alert" */
+const FAIL = new Set(["stopped", "error", "denied", "notfound", "model", "lost", "noloader", "noreturn", "mismatch", "badpkg", "loadfail", "nomidi"]);
+function show(txt) {
+  const bad = FAIL.has(lastKey);
+  $("alert").textContent = bad ? txt : "";
+  $("status").textContent = bad ? "" : txt;
+}
+const sayK = (k, arg = "") => { lastKey = k; lastArg = arg; show(t(k) + arg); };
+const say = (txt) => { lastKey = null; show(txt); };
+/* progress: said about every 10 percent or 2 seconds, not on every block */
+let progKey = null, progPct = -100, progT = 0;
+function sayProgress(k, pct) {
+  pct = Math.max(0, Math.min(100, Math.floor(pct)));
+  const now = performance.now();
+  if (k === progKey && pct < progPct + 10 && now - progT < 2000) return;
+  progKey = k; progPct = pct; progT = now;
+  sayK(k, (lang === "ja" ? " " : ", ") + pct + t("percent"));
+}
+const stockMsg = (k) => { $("stockmsg").textContent = t(k); };
 const log = (t) => { $("log").textContent += t + "\n"; };
 let image = null;
 const meta = /*META*/;
@@ -178,15 +205,16 @@ let stock = null;
 $("stockfile").addEventListener("change", async (e) => {
   stock = null;
   $("stockgo").disabled = true;
+  $("stockmsg").textContent = "";
   const f = e.target.files && e.target.files[0];
   if (!f) return;
   try {
     const raw = new Uint8Array(await f.arrayBuffer());
     const hex = [...new Uint8Array(await crypto.subtle.digest("SHA-256", raw))].map((b) => b.toString(16).padStart(2, "0")).join("");
-    if (hex !== STOCK_SHA256) { sayK("stockbad"); return; }
+    if (hex !== STOCK_SHA256) { stockMsg("stockbad"); return; }
     stock = { image: logicalImage(raw), product: productOf(raw) };
     $("stockgo").disabled = writing;
-    sayK("stockok");
+    stockMsg("stockok");
   } catch (err) { sayK("error", err && err.message); }
 });
 
@@ -202,9 +230,9 @@ async function run(img, product, isStock) {
     const step = (k, a) => {
       log(`${k} ${a ?? ""}`);
       if (k === "start") sayK("start");
-      if (k === "verify") { sayK("verify"); $("bar").value = (a / total) * 100; }
+      if (k === "verify") { $("bar").value = (a / total) * 100; sayProgress("verify", $("bar").value); }
       if (k === "loader") sayK("loader");
-      if (k === "write") { sayK("write"); $("bar").value = ((74 + a) / total) * 100; }
+      if (k === "write") { $("bar").value = ((74 + a) / total) * 100; sayProgress("write", $("bar").value); }
       if (k === "reboot") sayK("reboot");
       if (k === "done") { $("bar").value = 100; sayK(isStock ? "stockdone" : "done"); }
     };

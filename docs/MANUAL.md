@@ -6,7 +6,7 @@ MonkSynth, Jonathan Taylor's formant vocal synthesizer. The keys have velocity a
 from the FM-1's own keys with no changes to the hardware: velocity sets the note's level, aftertouch
 moves the vowel.
 
-![The FM-1 (a drawing), running MONK-1, each control labelled](img/fm1-panel.svg)
+![The FM-1 (a drawing), running MONK-1, each control labelled](img/fm1-panel.svg "A drawing of the FM-1's panel with each control labelled with what it does in MONK-1; section 3, Controls, lists them")
 
 ---
 
@@ -105,8 +105,8 @@ SEL, ARP, SEQ and REC do nothing in MONK-1.
 
 ## 4. The screen
 
-![Jerry singing](img/screen-singing.png)
-![The Sing page over the singer](img/screen-sing.png)
+![Jerry singing](img/screen-singing.png "The screen: Jerry the monk, eyes closed, mouth wide open, in front of prayer flags, snowy mountains and the sun")
+![The Sing page over the singer](img/screen-sing.png "The screen: HOME Sing, Jerry. Over the singer, Jerry's knobs: Vowel 50, Head 15 cm, Breath 50, Glide 50. Bottom line: PRESETS singer, ALGO vowel")
 
 Most of the time the screen is the singer on its stage. The mouth follows the vowel and opens wider
 as the note gets louder; with nothing playing, the singer blinks and mouths its vowels to itself.
@@ -129,8 +129,8 @@ each time the key is read, because a lit light upsets the reading; you may see t
 
 ## 5. Playing
 
-![Aftertouch: the vowel moves on](img/screen-pressure.png)
-![The Touch page](img/screen-touch.png)
+![Aftertouch: the vowel moves on](img/screen-pressure.png "The screen: Jerry singing with his mouth half open, rounded, as the vowel moves on")
+![The Touch page](img/screen-touch.png "The screen: GLO Touch, Jerry, for all singers: Pressure PITCH, Depth 50, Sensitive 50, Velocity 50")
 
 **One voice.** MONK-1 sings one note at a time, as a singer does. The newest key held sounds; let go
 and the voice goes back to the key still held under it. Moving between held keys glides (Sing:
@@ -164,10 +164,10 @@ octave before you let go.
 
 ## 6. The singers
 
-![Philip the unicorn](img/screen-unicorn.png)
-![Snider](img/screen-punk.png)
-![Razor](img/screen-cat.png)
-![Peppo](img/screen-pizza.png)
+![Philip the unicorn](img/screen-unicorn.png "The screen: Philip, a white unicorn with a rainbow mane, singing in front of a rainbow and clouds")
+![Snider](img/screen-punk.png "The screen: Snider, a punk with a green mohawk and a studded jacket, singing between two speakers")
+![Razor](img/screen-cat.png "The screen: Razor, a ginger cat, singing in front of a night window")
+![Peppo](img/screen-pizza.png "The screen: Peppo, a slice of pepperoni pizza, singing on a checked tablecloth beside a candle in a bottle")
 
 PRESETS turns through the twelve, from MonkSynth's iOS port: **Jerry** the monk, **Guppo**,
 **Philip**, **Suze**, **Gerald**, **Bess**, **EeOo**, **Snider**, **Fipsy**, **Peppo**, **Marley** and
@@ -184,8 +184,8 @@ The Touch page, the octave and the singer you were on are shared, not per singer
 
 Each page button brings up its four knobs. All values are per singer except on Touch.
 
-![The Envelope page](img/screen-envelope.png)
-![The Echo page](img/screen-echo.png)
+![The Envelope page](img/screen-envelope.png "The screen: ENV Envelope, Jerry (edited): Attack 0.00 s, Decay 0.00 s, Sustain 100, Release 0.00 s")
+![The Echo page](img/screen-echo.png "The screen: FX Echo, Jerry (edited): Amount 80, Time 50; knobs 3 and 4 unused")
 
 | Page | Button | KNOB 1 | KNOB 2 | KNOB 3 | KNOB 4 |
 |---|---|---|---|---|---|

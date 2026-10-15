@@ -40,7 +40,7 @@ LANDING = """<!doctype html>
 <style>
 /* MONK-1's cream, brown ink and saffron, as its screen */
 :root { --paper: #faf4e8; --sheet: #ece4d4; --rule: #d8cdba; --ink: #48392f; --muted: #706254;
-        --hot: #b5600c; --hot-t: #f6dcb8; --cool: #f0a020; --cool-t: #fbe8c4; color-scheme: light; }
+        --hot: #9c5208; --hot-t: #f6dcb8; --cool: #f0a020; --cool-t: #fbe8c4; color-scheme: light; }
 body { background: var(--paper); color: var(--ink); margin: 0; padding-inline: 16px; padding-block: 48px 64px;
        font: 400 17px/1.6 "Helvetica Neue", Helvetica, Arial, sans-serif; }
 main { max-width: 42rem; margin: 0 auto; }
@@ -54,7 +54,8 @@ h2 { font-size: 1.15rem; font-weight: 700; margin: 2.4rem 0 .6rem; padding-top: 
 .ways a { display: block; text-decoration: none; color: var(--ink); background: var(--sheet); border-radius: 8px; padding: 12px 16px; }
 .ways a:first-child { background: var(--hot); color: #fff; }
 .ways a:first-child span { color: #fbe8d4; }
-.ways a:hover, .ways a:focus-visible { background: var(--cool-t); color: var(--ink); outline: none; }
+.ways a:hover, .ways a:focus-visible { background: var(--cool-t); color: var(--ink); }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
 .ways a:first-child:hover span, .ways a:first-child:focus-visible span { color: var(--muted); }
 .ways strong { font-weight: 700; font-size: 1.15rem; display: block; }
 .ways span { color: var(--muted); font-size: .95rem; }
@@ -80,7 +81,7 @@ and aftertouch moves the vowel, read from the FM-1's own keys with no changes to
   <img src="img/screen-punk.png" width="240" height="240" alt="Snider the punk singing between two speakers">
 </div>
 <nav class="ways" aria-label="Get MONK-1">
-  <a href="emu/"><strong>Try it in the browser</strong><span>The same code the FM-1 runs, with sound. Click lower on a key for more velocity; drag down for aftertouch.</span></a>
+  <a href="emu/"><strong>Try it in the browser</strong><span>The same code the FM-1 runs, with sound. Click lower on a key for more velocity; drag down for aftertouch. Works from the keyboard too.</span></a>
   <a href="install/"><strong>Install <em class="v">v__VERSION__</em></strong><span>From Chrome or Edge, with the FM-1 connected by USB. Nothing to install on the computer.</span></a>
   <a href="manual/"><strong>Manual</strong><span>Getting started in a few minutes, then everything else.</span></a>
   <a href="firmware/__PKG__"><strong>Download <em class="v">__PKG__</em></strong><span>For the command-line installer: <code>python3 tools/fm1_install.py __PKG__</code></span></a>

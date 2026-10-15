@@ -22,7 +22,7 @@ CSS = """
 /* MONK-1's cream, brown ink and saffron (as its screen); a shade of the cream for code and callouts */
 :root {
   --paper: #faf4e8; --sheet: #ece4d4; --rule: #d8cdba; --ink: #48392f; --muted: #706254;
-  --hot: #b5600c; --hot-t: #f6dcb8; --cool: #f0a020; --cool-t: #fbe8c4;
+  --hot: #9c5208; --hot-t: #f6dcb8; --cool: #f0a020; --cool-t: #fbe8c4;
   color-scheme: light;
 }
 body {
@@ -85,6 +85,11 @@ figcaption { color: var(--muted); font-size: .88rem; margin-top: .4rem; max-widt
 figure.wide figcaption { max-width: none; }
 nav.contents li { break-inside: avoid; }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+:focus-visible { outline: 2px solid var(--hot); outline-offset: 2px; }
+pre:focus-visible, .table:focus-visible { outline-offset: 0; }
+.skip { position: absolute; left: 16px; top: -100px; background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 6px; z-index: 1; }
+.skip:focus { top: 8px; }
+body > .site { max-width: 46rem; margin-inline: auto; }
 """
 
 
@@ -105,11 +110,12 @@ def slug(title):
 
 
 NAME = "MONK-1"
+HEADER = []                                           # the site's header: before <main>, after the skip link
 IMG_BASE = SRC / "docs"
 EMBED = False                                         # --fragment: images as data URIs
 
 
-def figure(caption, src):
+def figure(caption, src, alt=None):
     path = IMG_BASE / src
     if EMBED:
         mime = "image/svg+xml" if src.endswith(".svg") else "image/png"
@@ -117,13 +123,13 @@ def figure(caption, src):
     else:
         url = src
     cls = "wide" if src.endswith(".svg") else "shot"
-    return (f'<figure class="{cls}"><img src="{url}" alt="{html.escape(caption)}" loading="lazy">'
+    return (f'<figure class="{cls}"><img src="{url}" alt="{html.escape(alt or caption)}" loading="lazy">'
             f"<figcaption>{inline(caption)}</figcaption></figure>")
 
 
 def convert(md):
     lines = md.splitlines()
-    out, i, contents, sections = [], 0, None, {}
+    out, i, contents, sections, last_h = [], 0, None, {}, "Table"
     for ln in lines:                                  # section numbers -> ids, for the contents
         m = re.match(r"## (\d+)\. (.+)", ln)
         if m:
@@ -134,16 +140,18 @@ def convert(md):
             j = i + 1
             while j < len(lines) and not lines[j].startswith("```"):
                 j += 1
-            out.append("<pre><code>" + html.escape("\n".join(lines[i + 1:j]), quote=False) + "</code></pre>")
+            out.append('<pre tabindex="0" aria-label="Command"><code>' + html.escape("\n".join(lines[i + 1:j]), quote=False) + "</code></pre>")
             i = j + 1
             continue
         if ln.startswith("!["):                      # consecutive image lines: one row of figures
             figs = []
             while i < len(lines) and (lines[i].startswith("![") or (not lines[i].strip() and i + 1 < len(lines)
                                                                     and lines[i + 1].startswith("!["))):
-                m = re.match(r"!\[(.*)\]\((.*)\)", lines[i])
+                # ![caption](src "what the picture shows"): the title is the alt text (the caption is shown
+                # beside it, so the alt says what is in the picture, not the caption again)
+                m = re.match(r'!\[(.*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)', lines[i])
                 if m:
-                    figs.append(figure(m.group(1), m.group(2)))
+                    figs.append(figure(m.group(1), m.group(2), m.group(3)))
                 i += 1
             out.append('<div class="figs">' + "".join(figs) + "</div>")
             continue
@@ -166,7 +174,7 @@ def convert(md):
         if ln.startswith("# "):                         # the title; MONK-1's own a way home (the site's root)
             t = ln[2:].strip()
             if t == NAME:                               # the site's header (home, the other pages), then the title
-                out.append('<header class="site"><a class="home" href="../">MONK-1</a><nav><a href="../emu/">Emulator</a><a href="../install/">Install</a><a href="../manual/" aria-current="page">Manual</a><a href="https://github.com/charlesvestal/fm1-monk">Source</a></nav></header>')
+                HEADER.append('<header class="site"><a class="home" href="../">MONK-1</a><nav><a href="../emu/">Emulator</a><a href="../install/">Install</a><a href="../manual/" aria-current="page">Manual</a><a href="https://github.com/charlesvestal/fm1-monk">Source</a></nav></header>')
                 out.append('<h1>Manual</h1>')
             else:
                 out.append(f'<a class="home" href="../">{NAME}</a>\n<h1>{inline(t)}</h1>')
@@ -177,10 +185,12 @@ def convert(md):
                 contents = True
                 out.append('<nav class="contents" aria-label="Contents"><h2 id="contents">Contents</h2>')
             elif m:
+                last_h = re.sub(r"[*`]", "", m.group(2))
                 out.append(f'<h2 id="s{m.group(1)}"><span class="num">{m.group(1)}</span>{inline(m.group(2))}</h2>')
             else:
                 out.append(f'<h2 id="{slug(t)}">{inline(t)}</h2>')
         elif ln.startswith("### "):
+            last_h = re.sub(r"[*`]", "", ln[4:].strip())
             out.append(f'<h3 id="{slug(ln[4:])}">{inline(ln[4:])}</h3>')
         elif ln.strip() == "---":
             if contents:
@@ -193,7 +203,7 @@ def convert(md):
                 rows.append([c.strip() for c in lines[i].strip().strip("|").split("|")])
                 i += 1
             head, body = rows[0], [r for r in rows[1:] if not set("".join(r)) <= set("-: ")]
-            out.append('<div class="table"><table><thead><tr>' + "".join(f"<th>{inline(c)}</th>" for c in head) +
+            out.append(f'<div class="table" tabindex="0" role="region" aria-label="{html.escape(last_h, quote=True)}: table"><table><thead><tr>' + "".join(f"<th>{inline(c)}</th>" for c in head) +
                        "</tr></thead><tbody>" + "".join("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in r) + "</tr>"
                                                          for r in body) + "</tbody></table></div>")
             continue
@@ -242,12 +252,13 @@ def main():
     body = convert(md)
     page = (f"<title>{html.escape(title)}</title>\n"
             f'<meta name="description" content="{html.escape(what)} for {NAME}, twelve singers for the M-VAVE FM-1.">\n'
-            f"<style>{CSS}</style>\n<main>\n{body}\n</main>\n")
+            f"<style>{CSS}</style>\n" + ('<a class="skip" href="#content">Skip to content</a>\n' if not fragment else "") +
+            "".join(HEADER) + f'\n<main id="content">\n{body}\n</main>\n')
     if not fragment:
-        head, _, rest = page.partition("<main>")
+        head, _, rest = page.partition("<a class=\"skip\"")
         page = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
                 '<meta name="viewport" content="width=device-width, initial-scale=1">\n' + head +
-                "</head>\n<body>\n<main>" + rest + "</body>\n</html>\n")
+                "</head>\n<body>\n<a class=\"skip\"" + rest + "</body>\n</html>\n")
     dst.write_text(page)
     print(f"{dst}: {len(page)} bytes")
 

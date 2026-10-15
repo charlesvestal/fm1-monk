@@ -55,6 +55,11 @@ class Monk extends AudioWorkletProcessor {
       this.ex.web_enc(m.role, m.n | 0);
     } else if (m.type === "master") {
       this.ex.web_master(m.value | 0);
+    } else if (m.type === "sysex" && this.ex.web_sysex) {      // the screen reader's HELLO / WHERE / BYE (F0..F7 stripped)
+      const d = m.data.subarray ? m.data : Uint8Array.from(m.data);
+      const n = Math.min(d.length, 64);
+      new Uint8Array(this.mem.buffer, this.ex.web_sysex_buf(), n).set(d.subarray(0, n));
+      this.ex.web_sysex(n);
     }
   }
 
@@ -67,6 +72,11 @@ class Monk extends AudioWorkletProcessor {
       this.busy = this.frames = 0;
     }
     const transfer = [];
+    if (ex.web_said_len && ex.web_said_len() > 0) {           // what the firmware said to its reader: whole F0..F7 frames
+      msg.said = new Uint8Array(this.mem.buffer, ex.web_said_buf(), ex.web_said_len()).slice();
+      ex.web_said_clear();
+      transfer.push(msg.said.buffer);
+    }
     if (blits !== this.sentBlits) {
       this.sentBlits = blits;
       msg.fb = new Uint16Array(this.mem.buffer, ex.web_fb(), 240 * 240).slice();
