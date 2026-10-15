@@ -231,6 +231,14 @@ listens to aftertouch.
 | CC 13 | Head |
 | CC 120, 123 | All notes off |
 
+### Screen reader
+
+MONK-1 can tell the [FM-1 Screen Reader](https://charlesvestal.github.io/fm1-reader/) what its screen
+shows, over the same USB cable: the singer you pick, the page and its knobs, a knob's value as you turn
+it, and what each button did (hold, octave, saved). Its "Read the whole screen" button tells you
+everything at once. Open the page in Chrome with the FM-1 plugged in; it speaks with its own voice, or hands the
+words to your computer's screen reader. The singers' faces are just for looking at, so they stay quiet.
+
 ---
 
 ## 9. Saving

@@ -18,6 +18,8 @@
  * button, a knob or a new singer brings up the menu over it for a few seconds (Polly's layout): the
  * header (the button that opened the page as a keycap, the page, the singer), the tag (whose the knobs
  * are, the page dots), the knobs (name, value, a bar) and the encoders' line.
+ * A screen reader on the computer (fm1-reader, over USB-MIDI SysEx: announce.c) hears the singer, the page and
+ * its knobs, a knob as it turns and what each button did ("screen reader" below); the face is for the eye.
  * USB MIDI out: the notes (channel 1) with the keys' velocity, and polyphonic aftertouch. In: notes (any
  * channel), CC 1 vowel, 5 glide, 7 level, 12 echo, 13 head size, aftertouch, CC 123 all off. */
 
@@ -96,7 +98,10 @@ static struct {
     uint8_t save_long;                 /* its hold did the reset */
 } ui;
 
-static void say(const char *a)
+static uint8_t sp_said;                 /* a message went to the screen reader this frame: speak() leaves it be */
+/* a message in the header; to a screen reader (announce.c) as `spoken` (0: the screen's text), without the
+ * dots that are for the eye ("UPDATE MODE IN 3..") */
+static void say_as(const char *a, const char *spoken, uint32_t flags)
 {
     uint32_t i;
     for (i = 0; i < 23u && a && a[i]; i++)
@@ -105,7 +110,19 @@ static void say(const char *a)
     ui.msg_until = plat_ms() + 1500u;
     ui.tag_until = ui.msg_until;
     ui.tag_dirty = 1;
+    if (ann_on()) {
+        char t[40];
+        const char *s = spoken ? spoken : ui.msg;
+        for (i = 0; i < sizeof t - 1u && s[i]; i++)
+            t[i] = s[i];
+        while (i && (t[i - 1] == '.' || t[i - 1] == ' '))
+            i--;
+        t[i] = 0;
+        ann_say(t, 0, flags);
+        sp_said = 1;
+    }
 }
+static void say(const char *a) { say_as(a, 0, ANN_NOW); }
 void ui_say(const char *a, const char *b)
 {
     char t[24];
@@ -223,7 +240,7 @@ static void set_hold(int on)
     ui.hold = (uint8_t)on;
     if (on) {
         ui.hold_note = ui.nstack ? (int16_t)note_of(ui.stack[ui.nstack - 1u]) : -1;
-        say("HOLD");
+        say_as("HOLD", "HOLD ON", ANN_NOW);
     } else {
         ui.hold_note = -1;
         release_strays();
@@ -352,6 +369,12 @@ static void events(void)
     }
 }
 
+/* what the user turned or chose, for the screen reader (speak()): a knob's readout, a page; nothing that
+ * moves by itself (pressure, MIDI in) is said */
+#define SP_VOWEL 4                     /* sp_turn: ALGORITHM, the vowel, from any page */
+static int8_t sp_turn = -1;            /* the knob turned (0..3), SP_VOWEL, -1 none */
+static uint8_t sp_page_req;            /* a page button or SELECT: the page is said */
+
 /* --------------------------------------------------------------------------- values */
 static float pval(uint32_t page, uint32_t i)
 {
@@ -428,6 +451,7 @@ static void turn(uint32_t i, int32_t e)
     if (id >= T_ROUTE && id != T_NONE)
         monk_touch(proj.at_route, (float)proj.at_depth * 0.01f, (float)proj.vel_sens * 0.01f);
     ui.touched = (int8_t)i;
+    sp_turn = (int8_t)i;
     menu_show(2500u);
     mark_dirty();
 }
@@ -435,6 +459,7 @@ static void turn(uint32_t i, int32_t e)
 static void set_page(uint32_t pg)
 {
     proj.page = (uint8_t)(pg % NPAGES);
+    sp_page_req = 1;                   /* said even when it is the same page: the button is answered */
     ui.touched = -1;
     ui.msg_until = 0;
     menu_show(3000u);
@@ -479,7 +504,7 @@ static void button(int b)
             ui.saved_t = plat_ms();
             say("SAVED");
         } else {
-            say("SAVE FAILED");
+            say_as("SAVE FAILED", "NOT SAVED, FLASH ERROR", ANN_NOW | ANN_KEEP);   /* heard whole */
         }
         break;
     case B_OCTDN:
@@ -492,7 +517,7 @@ static void button(int b)
         t[7] = o >= 2 ? '+' : '-';
         t[8] = (char)('0' + (o >= 2 ? o - 2 : 2 - o));
         t[9] = 0;
-        say(t);
+        say_as(t, o == 2 ? "OCTAVE 0" : 0, ANN_NOW);   /* (the screen's "+0" is not said) */
         mark_dirty();
         break;
     }
@@ -543,8 +568,10 @@ static void input(void)
         uint32_t g = page_group(proj.page), n = PAGE_BTN[g].n;
         if (n > 1)
             set_page(PAGE_BTN[g].first + (proj.page - PAGE_BTN[g].first + n + (e > 0 ? 1u : n - 1u)) % n);
-        else
+        else {
             menu_show(2000u);
+            sp_page_req = 1;
+        }
     }
     if ((e = plat_enc(EN_PRESET)) != 0)
         set_character((int32_t)proj.character + (e > 0 ? 1 : -1));
@@ -552,6 +579,7 @@ static void input(void)
         float *p = cur_p();
         p[MK_VOWEL] = fm_clampf(p[MK_VOWEL] + 0.02f * (float)e, 0.0f, 1.0f);
         monk_param(MK_VOWEL, p[MK_VOWEL]);
+        sp_turn = SP_VOWEL;
         if (proj.page == PG_SING)
             menu_show(2500u);
         mark_dirty();
@@ -808,6 +836,194 @@ static void draw(void)
     ui.strip_dirty = 0;
 }
 
+/* --------------------------------------------------------------------------- screen reader */
+/* The screen as text for a screen reader on the computer (announce.c; fm1-reader): the singer when it
+ * changes, with its page's knobs; a page once it settles, with its knobs; a knob's value as it turns (or
+ * ALGORITHM's vowel); what a button did (say). WHERE (the reader asks, or it has just started listening) is
+ * everything: the singer, the page, HOLD, the octave and the encoders' jobs. The face is for the eye: the
+ * notes, the mouth and pressure are not said. Nothing is built while no reader listens. */
+static struct {
+    uint8_t started, page, singer;
+} sp OM_POOL;
+static char sp_buf[ANN_MAX + 1] OM_POOL;
+static uint32_t sp_n;
+
+static void sp_cat(const char *s)
+{
+    while (*s && sp_n < ANN_MAX)
+        sp_buf[sp_n++] = *s++;
+    sp_buf[sp_n] = 0;
+}
+static void sp_knob(uint32_t page, uint32_t i)     /* "Head 15 cm" */
+{
+    char t[16];
+    sp_cat(PAGE_LABEL[page][i]);
+    sp_cat(" ");
+    pfmt(page, i, t);
+    sp_cat(t);
+}
+static void sp_singer(void)                        /* "Guppo, edited" */
+{
+    sp_cat(cur()->name);
+    if (edited())
+        sp_cat(", edited");
+}
+static void sp_page(void)                          /* "Sing page: Vowel 50, Head 15 cm, Breath 20, Glide 10" */
+{
+    uint32_t i;
+    sp_cat(PAGE_NAME[proj.page]);
+    sp_cat(proj.page == PG_TOUCH ? " page, all singers" : " page");
+    for (i = 0; i < 4u; i++)
+        if (PAGE_LABEL[proj.page][i]) {
+            sp_cat(i ? ", " : ": ");
+            sp_knob(proj.page, i);
+        }
+}
+static void sp_where(void)
+{
+    char t[4] = {0};
+    sp_n = 0;
+    sp_singer();
+    sp_cat(". ");
+    sp_page();
+    if (ui.hold)
+        sp_cat(". Hold on");
+    if (proj.octave != 2u) {
+        sp_cat(". Octave ");
+        t[0] = proj.octave > 2u ? '+' : '-';
+        t[1] = (char)('0' + (proj.octave > 2u ? proj.octave - 2u : 2u - proj.octave));
+        sp_cat(t);
+    }
+    sp_cat(". PRESETS: singer, ALGO: vowel");
+}
+
+static void sp_reset(void)
+{
+    sp.page = proj.page;
+    sp.singer = proj.character;
+    sp_turn = -1;
+    sp_page_req = 0;
+    sp_said = 0;
+}
+
+static void speak(void)
+{
+    uint32_t now = plat_ms();
+    int where = ann_where();
+    if (!ann_on()) {
+        sp.started = 0;
+        sp_reset();
+        return;
+    }
+    if (!sp.started || where) {              /* everything on the screen */
+        sp.started = 1;
+        sp_reset();
+        sp_where();
+        ann_say(sp_buf, 0, ANN_NOW);
+        return;
+    }
+    if (sp_said) {                                 /* a button said what it did (and what it changed) */
+        sp_reset();
+        return;
+    }
+    if (proj.character != sp.singer) {             /* a new singer: its name, and its knobs here */
+        sp_reset();
+        sp_n = 0;
+        sp_singer();
+        if (proj.page != PG_TOUCH) {               /* (Touch's knobs are every singer's: they did not change) */
+            sp_cat(". ");
+            sp_page();
+        }
+        ann_later(sp_buf, ANN_NOW, 200u, now);
+        return;
+    }
+    if (proj.page != sp.page || sp_page_req) {     /* a page: said when it settles */
+        sp_reset();
+        sp_n = 0;
+        sp_page();
+        ann_later(sp_buf, ANN_NOW, 200u, now);
+        return;
+    }
+    if (sp_turn >= 0) {                            /* a knob turning: its name and value */
+        sp_n = 0;
+        if (sp_turn == SP_VOWEL)
+            sp_knob(PG_SING, 0);
+        else
+            sp_knob(proj.page, (uint32_t)sp_turn);
+        sp_turn = -1;
+        ann_later(sp_buf, ANN_NOW, 120u, now);
+    }
+}
+
+#if defined OM_HOST && !defined OM_WEB
+/* every screen, knob value, singer and message as a screen reader gets them (the "speakdump" command):
+ * KIND <tab> the text sent (fm1-reader/tools/audit.mjs puts it in words with web/words/ and checks it) */
+static void sp_print(const char *kind, const char *t) { printf("%s\t%s\n", kind, t); }
+static void speak_dump(void)
+{
+    static const char *const MSG[] = {"HOLD ON", "HOLD OFF", "SAVED", "VOICE RESET", "OCTAVE -2", "OCTAVE -1", "OCTAVE 0",
+                                      "OCTAVE +1", "OCTAVE +2", "UPDATE MODE IN 3", "UPDATE MODE CANCELLED"};
+    project_t keep = proj;
+    uint8_t keep_hold = ui.hold;
+    uint32_t pg, i, x, c;
+    for (pg = 0; pg < NPAGES; pg++) {
+        proj.page = (uint8_t)pg;
+        sp_n = 0;
+        sp_page();
+        sp_print("SCREEN", sp_buf);
+        for (i = 0; i < 4u; i++) {
+            uint32_t id = PAGE_P[pg][i];
+            if (id == T_NONE)
+                continue;
+            for (x = 0; x <= 100u; x++) {
+                if (id == T_ROUTE && x >= MK_NAT)
+                    break;
+                if (id == T_ROUTE)
+                    proj.at_route = (uint8_t)x;
+                else if (id == T_DEPTH)
+                    proj.at_depth = (uint8_t)x;
+                else if (id == T_SENS)
+                    proj.p_sens = (uint8_t)x;
+                else if (id == T_VEL)
+                    proj.vel_sens = (uint8_t)x;
+                else
+                    cur_p()[id] = (float)x * 0.01f;
+                sp_n = 0;
+                sp_knob(pg, i);
+                sp_print("KNOB", sp_buf);
+            }
+            proj = keep;
+        }
+    }
+    for (c = 0; c < ART_N; c++) {                  /* each singer, as it came and edited */
+        proj.character = (uint8_t)c;
+        proj.page = PG_SING;
+        for (x = 0; x < 2u; x++) {
+            float b = cur()->p[MK_BREATH];
+            cur_p()[MK_BREATH] = x ? (b < 0.5f ? b + 0.4f : b - 0.4f) : b;
+            sp_n = 0;
+            sp_singer();
+            sp_cat(". ");
+            sp_page();
+            sp_print("SCREEN", sp_buf);
+        }
+        proj = keep;
+    }
+    for (x = 0; x < 10u; x++) {                    /* WHERE: each page, HOLD, the octaves */
+        proj.page = (uint8_t)(x % NPAGES);
+        proj.octave = (uint8_t)(x % 5u);
+        ui.hold = (uint8_t)(x & 1u);
+        sp_where();
+        sp_print("WHERE", sp_buf);
+    }
+    proj = keep;
+    ui.hold = keep_hold;
+    for (i = 0; i < sizeof MSG / sizeof MSG[0]; i++)
+        sp_print("MSG", MSG[i]);
+    sp_print("WARN", "NOT SAVED, FLASH ERROR");
+}
+#endif
+
 static void leds(void)
 {
     uint32_t b = 0;
@@ -845,6 +1061,8 @@ void ui_frame(void)
     input();
     autosave();
     leds();
+    speak();                                   /* the screen reader (announce.c) */
+    ann_tick(plat_ms());
     if (plat_ms() - ui.last_draw < 33u)        /* ~30 frames/s: the mouth moves in frames anyway */
         return;
     ui.last_draw = plat_ms();

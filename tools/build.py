@@ -125,10 +125,12 @@ def tc_all(*cmds):
 
 
 def generate():
-    """generated headers: the font (Felucca's), the characters (tools/gen_art.py)"""
+    """generated headers: the font (Felucca's), the characters (tools/gen_art.py), the screen reader's words
+    link (tools/gen_words.py, fm1-reader's: firmware/words.tsv -> web/words/<id>.json and ann_words.h)"""
     GEN.mkdir(parents=True, exist_ok=True)
-    for tool, out in (("gen_font.py", "felucca_font.h"), ("gen_art.py", "art.h")):
-        r = subprocess.run([sys.executable, str(SRC / "tools" / tool), str(GEN / out)], capture_output=True, text=True)
+    for tool, args in (("gen_font.py", [GEN / "felucca_font.h"]), ("gen_art.py", [GEN / "art.h"]),
+                       ("gen_words.py", [SRC / "firmware" / "words.tsv", SRC / "web" / "words", GEN / "ann_words.h"])):
+        r = subprocess.run([sys.executable, str(SRC / "tools" / tool), *map(str, args)], capture_output=True, text=True)
         sys.stdout.write(r.stdout)
         if r.returncode:
             sys.stderr.write(r.stderr)

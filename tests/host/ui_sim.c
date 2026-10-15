@@ -3,7 +3,23 @@
  * framebuffer and a scripted panel. Runs a short session (a character, a note sung with pressure, the
  * knobs, the pages, HOLD, the next singer), checks what it can (the notes reach the voice, the
  * settings change, the screen draws), and writes screenshots (raw RGB565, big-endian) for
- * tests/ui_shots.py. Also the audio: each render's peak, so a session that goes silent or clips fails. */
+ * tests/ui_shots.py. Also the audio: each render's peak, so a session that goes silent or clips fails.
+ *
+ *   ui_sim DIR                 the session above
+ *   ui_sim DIR SCRIPT          a script instead (tests/scenarios/NAME.monk), one command a line (# comments):
+ *     wait MS                  time passes
+ *     tap BTN                  a button pressed and let go (FX SEL ENV LFO EDIT GLO HOME SAVE ARP SEQ PLAY REC OCT- OCT+)
+ *     hold BTN MS              a button held MS ms, then let go
+ *     turn ENC N               an encoder N detents (SELECT ALGO PRESETS K1..K4)
+ *     key K [MS]               analog key K (0 = F3) pressed firmly, held MS ms (200; leaning on it the second
+ *                              half: pressure), let go
+ *     listen                   a screen reader starts listening (HELLO, again every 2 s): each SAY is printed
+ *                              ("said: ..."; "said!:" cuts off what was being said)
+ *     where                    the reader asks for everything on the screen
+ *     said TEXT                some SAY since the last "said" (or "listen") has TEXT in it: else a failure
+ *     silent                   nothing was said since the last "said" (or "silent"): else a failure
+ *     speakdump                every page, knob value, singer and message as the reader gets them (the audit)
+ *   MONK_SAID_LOG=FILE: a reader listens from boot, quietly, and every SAY is appended to FILE (the audit). */
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,6 +90,39 @@ uint32_t plat_cpu_pct(void) { return 0; }
 uint32_t plat_xruns(void) { return 0; }
 
 #include "app/app.h"
+#define ANN_NAME "MONK-1 " OM_VERSION
+#include "ann_words.h"                                  /* the words file's link (tools/gen_words.py) */
+#include "announce.c"
+/* what the reader is told: every SAY to stdout with "said:" (listen), and kept for the "said" check */
+static char said_last[ANN_MAX + 1], said_log[16384];   /* said_log: every SAY since the last "said" check */
+static uint32_t said_len;
+static int said_print = 1, sim_listen;
+static FILE *said_log_f;                                /* MONK_SAID_LOG=FILE: every SAY, for fm1-reader's audit */
+static int ann_wire_send(const uint8_t *p, uint32_t n)
+{
+    if (n >= 7u && p[4] == ANN_SAY) {
+        uint32_t i, k = 0;
+        for (i = 6; i + 1u < n && k < ANN_MAX; i++)
+            said_last[k++] = (char)p[i];
+        said_last[k] = 0;
+        if (said_len + k + 2u < sizeof said_log) {
+            memcpy(said_log + said_len, said_last, k);
+            said_len += k;
+            said_log[said_len++] = '\n';
+            said_log[said_len] = 0;
+        }
+        if (said_print && sim_listen)
+            printf("said%s: %s\n", (p[5] & ANN_NOW) ? "!" : "", said_last);
+        if (said_log_f)
+            fprintf(said_log_f, "%s\t%s\n", (p[5] & ANN_KEEP) ? "WARN" : "MSG", said_last);
+    }
+    return 0;
+}
+static void sim_hello(void)
+{
+    static const uint8_t HELLO[] = {ANN_H0, ANN_H1, ANN_H2, ANN_HELLO, ANN_VER};
+    ann_frame(HELLO, sizeof HELLO, now_ms);
+}
 #include "app/sense.c"
 #include "app/project.c"
 #include "app/inflate.c"
@@ -90,6 +139,8 @@ static void step(uint32_t ms)              /* time passes: the scan, the audio, 
     uint32_t t;
     for (t = 0; t < ms; t++) {
         now_ms++;
+        if (sim_listen && now_ms % 2000u == 0u)   /* the reader's HELLO, as it sends it */
+            sim_hello();
         if (now_ms % 6u == 0u) {           /* ~ one 256-frame render every 5.8 ms */
             uint32_t i;
             monk_render(out, 256, 4096);
@@ -154,6 +205,116 @@ static void shot(const char *dir, const char *name)
     }
 }
 
+static int button_of(const char *n)
+{
+    int i;
+    for (i = 0; i < NB; i++)
+        if (!strcmp(n, BTN_LABEL[i]))
+            return i;
+    return -1;
+}
+static int enc_of(const char *n)
+{
+    static const char *const ENC[NE] = {"SELECT", "ALGO", "PRESETS", "K1", "K2", "K3", "K4"};
+    int i;
+    for (i = 0; i < NE; i++)
+        if (!strcmp(n, ENC[i]))
+            return i;
+    return -1;
+}
+
+static int script(const char *path)
+{
+    char line[512];
+    int lineno = 0;
+    FILE *f = fopen(path, "r");
+    if (!f) {
+        printf("FAIL: no script %s\n", path);
+        return 1;
+    }
+    while (fgets(line, sizeof line, f)) {
+        char cmd[32] = {0}, a[64] = {0}, b[64] = {0};
+        int x;
+        lineno++;
+        if (sscanf(line, "%31s %63s %63s", cmd, a, b) < 1 || cmd[0] == '#')
+            continue;
+        if (!strcmp(cmd, "wait")) {
+            step((uint32_t)atoi(a));
+        } else if (!strcmp(cmd, "tap") || !strcmp(cmd, "hold")) {
+            if ((x = button_of(a)) < 0) {
+                printf("FAIL line %d: no button %s\n", lineno, a);
+                fails++;
+                continue;
+            }
+            if (cmd[0] == 't') {
+                tap(x);
+            } else {
+                sim_btn |= 1u << x;
+                step((uint32_t)atoi(b));
+                sim_btn &= ~(1u << x);
+                step(40);
+            }
+        } else if (!strcmp(cmd, "turn")) {
+            if ((x = enc_of(a)) < 0) {
+                printf("FAIL line %d: no encoder %s\n", lineno, a);
+                fails++;
+                continue;
+            }
+            sim_enc[x] += atoi(b);
+            step(40);
+        } else if (!strcmp(cmd, "key")) {
+            uint32_t ms = b[0] ? (uint32_t)atoi(b) : 200u;
+            x = atoi(a);
+            press((uint32_t)x, 300, 560);
+            hold_press((uint32_t)x, 300, 560, ms / 2u);
+            hold_press((uint32_t)x, 300, 500, ms - ms / 2u);   /* leaning on it: pressure */
+            release((uint32_t)x);
+        } else if (!strcmp(cmd, "listen")) {
+            sim_listen = 1;
+            said_len = 0;
+            said_log[0] = 0;
+            sim_hello();
+            step(40);
+        } else if (!strcmp(cmd, "where")) {
+            static const uint8_t WHERE[] = {ANN_H0, ANN_H1, ANN_H2, ANN_WHERE};
+            ann_frame(WHERE, sizeof WHERE, now_ms);
+            step(40);
+        } else if (!strcmp(cmd, "speakdump")) {
+            speak_dump();
+        } else if (!strcmp(cmd, "silent")) {
+            if (said_len) {
+                printf("FAIL line %d: silent: said %s", lineno, said_log);
+                fails++;
+            } else if (said_print) {
+                printf("  ok silent\n");
+            }
+            said_len = 0;
+            said_log[0] = 0;
+        } else if (!strcmp(cmd, "said")) {
+            char *t = line + 4, *e;
+            while (*t == ' ')
+                t++;
+            e = t + strlen(t);
+            while (e > t && (e[-1] == '\n' || e[-1] == '\r' || e[-1] == ' '))
+                *--e = 0;
+            if (!strstr(said_log, t)) {
+                printf("FAIL line %d: said \"%s\": not said (since the last check: %s)\n", lineno, t,
+                       said_len ? said_log : "nothing\n");
+                fails++;
+            } else if (said_print) {
+                printf("  ok said \"%s\"\n", t);
+            }
+            said_len = 0;
+            said_log[0] = 0;
+        } else {
+            printf("FAIL line %d: what is \"%s\"?\n", lineno, cmd);
+            fails++;
+        }
+    }
+    fclose(f);
+    return fails != 0;
+}
+
 int main(int argc, char **argv)
 {
     const char *dir = argc > 1 ? argv[1] : ".";
@@ -164,6 +325,20 @@ int main(int argc, char **argv)
     project_load();
     project_apply();
     ui_init();
+    if (getenv("MONK_SAID_LOG")) {                 /* a reader listens from the start, quietly: the log only */
+        said_log_f = fopen(getenv("MONK_SAID_LOG"), "a");
+        sim_listen = 1;
+        said_print = 0;
+        sim_hello();
+    }
+    if (argc > 2) {
+        int r;
+        step(300);
+        r = script(argv[2]);
+        if (said_print)
+            printf(r ? "%s: %d failures\n" : "%s: ok\n", argv[2], fails);
+        return r;
+    }
     step(300);
     shot(dir, "01_boot");
     CHECK(ui.scene == 0, "the first character is on screen");

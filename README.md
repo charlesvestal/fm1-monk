@@ -49,6 +49,13 @@ The pages:
 USB MIDI out: the notes on channel 1 with their velocity, and polyphonic aftertouch. In: notes (any
 channel), CC 1 vowel, 5 glide, 7 level, 12 echo, 13 head size, aftertouch, CC 123 all notes off.
 
+### Screen reader
+
+MONK-1 tells the [FM-1 Screen Reader](https://charlesvestal.github.io/fm1-reader/) what its screen shows,
+over USB: the singer, the page and its knobs, a knob's value as it turns, and what each button did. Open the
+page in Chrome with the FM-1 plugged in; it speaks with its own voice, or hands the text to your computer's
+screen reader.
+
 ## How it is made
 
 - **The voice** (`firmware/src/dsp/monk.c`) is MonkSynth's DSP (MIT) ported: FOF synthesis, a grain

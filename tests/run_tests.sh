@@ -37,8 +37,13 @@ PY="${PYTHON:-python3}"
 run face sh -c "$PY tools/gen_art.py $OUT/gen/art.h >/dev/null && mkdir -p $OUT/face && \
     $CC -O2 -std=c99 -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -I$OUT/gen -o $OUT/face_test tests/host/face_test.c && \
     $OUT/face_test $OUT/face && $PY tests/face_compare.py $OUT/face"
+mkdir -p build/gen
+"$PY" tools/gen_words.py firmware/words.tsv web/words build/gen/ann_words.h >/dev/null   # the screen reader's words link
 run ui sh -c "mkdir -p $OUT/ui && $CC -O1 -std=gnu99 -w -DOM_HOST -Ifirmware/src -Ifirmware/hal -I$OUT/gen -Ibuild/gen \
     -o $OUT/ui_sim tests/host/ui_sim.c firmware/src/dsp/monk.c -lm && $OUT/ui_sim $OUT/ui"
+for f in tests/scenarios/*.monk; do            # scripted sessions: the screen reader's words (said checks)
+    run "scenario-$(basename "$f" .monk)" $OUT/ui_sim $OUT/ui "$f"
+done
 if command -v emcc >/dev/null 2>&1; then
     run web sh web/emu/build.sh
 else

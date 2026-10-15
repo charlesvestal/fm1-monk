@@ -1,0 +1,73 @@
+# the screen reader (fm1-reader, announce.c): a reader listens, and each singer, page, knob and button is said
+# once, in the screen's own text (the words file says it in full); the notes, the face and pressure are not
+wait 200
+listen
+wait 100
+said Jerry. Sing page: Vowel 50, Head 15 cm, Breath 50, Glide 50. Octave -1. PRESETS: singer, ALGO: vowel
+# a page settles before it is said
+tap ENV
+wait 300
+said Envelope page: Attack 0.00 s, Decay 0.00 s, Sustain 100, Release 0.00 s
+# a knob: its name and value, once it settles
+turn K2 3
+wait 300
+said Decay 0.15 s
+# ALGORITHM: the vowel, from any page
+turn ALGO 2
+wait 300
+said Vowel 54
+# the same page button again, and SELECT: the page is said again (the button is answered)
+tap ENV
+wait 300
+said Envelope page
+turn SELECT 1
+wait 300
+said Envelope page
+# Touch: every singer's
+tap GLO
+wait 300
+said Touch page, all singers: Pressure VOWEL, Depth 50, Sensitive 50, Velocity 50
+turn K1 1
+wait 300
+said Pressure PITCH
+# a singer: its name, and its knobs on the page (not on Touch: they are every singer's)
+turn PRESETS 1
+wait 300
+said Guppo
+tap HOME
+wait 300
+said Sing page: Vowel 50, Head 21 cm, Breath 5, Glide 50
+turn PRESETS -1
+wait 300
+said Jerry, edited. Sing page: Vowel 54
+# turning through singers: only where it stops
+turn PRESETS 1
+turn PRESETS 1
+turn PRESETS 1
+wait 300
+said Suze. Sing page
+# singing is for the eye and the ear: nothing is said, pressure or not
+key 5 600
+wait 200
+silent
+# the buttons' messages
+tap PLAY
+said HOLD ON
+tap PLAY
+said HOLD OFF
+tap OCT+
+said OCTAVE 0
+tap OCT+
+said OCTAVE +1
+tap OCT-
+tap OCT-
+said OCTAVE -1
+tap SAVE
+said SAVED
+hold SAVE 1700
+said VOICE RESET
+# WHERE: everything again
+tap FX
+wait 300
+where
+said Suze. Echo page: Amount 80, Time 50. Octave -1. PRESETS: singer, ALGO: vowel

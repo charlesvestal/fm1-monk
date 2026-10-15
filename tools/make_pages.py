@@ -5,6 +5,7 @@
   index.html                     what MONK-1 is, and the ways in: try, install, manual, download, source
   img/                           screenshots (docs/img, from tools/gen_screens.sh)
   emu/                           MONK-1 in the browser (build/emu, from web/emu/build.sh)
+  words/                         the screen reader's words files (web/words, from firmware/words.tsv)
   install/index.html             the web installer (web/monk_installer.html, with fm1pkg.js, fm1ota.js and
                                  the package's metadata inlined; Chrome or Edge, Web MIDI)
   manual/index.html, img/        the manual (tools/manual_html.py, from docs/MANUAL.md)
@@ -140,8 +141,10 @@ def main(pkg, version, out):
     if not (emu / "monk.wasm").exists():
         raise SystemExit("no build/emu/monk.wasm: run web/emu/build.sh (needs Emscripten)")
     shutil.copytree(emu, out / "emu")
+    # the screen reader's words files (fm1-reader): every one ever made, for the devices that point at them
+    shutil.copytree(SRC / "web" / "words", out / "words")
     (out / ".nojekyll").write_text("")
-    print(f"site: {out}: index.html, install/ ({product}), manual/, emu/, firmware/{name} ({len(raw)} B)")
+    print(f"site: {out}: index.html, install/ ({product}), manual/, emu/, words/, firmware/{name} ({len(raw)} B)")
 
 
 if __name__ == "__main__":

@@ -90,6 +90,22 @@ uint32_t plat_cpu_pct(void) { return 0; }
 uint32_t plat_xruns(void) { return 0; }
 
 #include "app/app.h"
+#define ANN_NAME "MONK-1 " OM_VERSION
+#include "ann_words.h"                 /* the words file's link (tools/gen_words.py) */
+#include "announce.c"
+/* a screen reader (fm1-reader): the page writes a SysEx frame (the bytes between F0 and F7) to web_sysex_buf and
+ * calls web_sysex(n); what the firmware says back, whole F0..F7 frames, from web_said_buf (web_said_len bytes;
+ * web_said_clear when read) */
+static uint8_t said_buf[4096], sx_in[64];
+static uint32_t said_n;
+static int ann_wire_send(const uint8_t *p, uint32_t n)
+{
+    if (said_n + n > sizeof said_buf)
+        return -1;
+    memcpy(said_buf + said_n, p, n);
+    said_n += n;
+    return 0;
+}
 #include "app/sense.c"
 #include "app/project.c"
 #include "app/inflate.c"
@@ -210,6 +226,11 @@ EXPORT void web_boot(void)
     project_apply();
     ui_init();
 }
+EXPORT uint8_t *web_said_buf(void) { return said_buf; }
+EXPORT uint32_t web_said_len(void) { return said_n; }
+EXPORT void web_said_clear(void) { said_n = 0; }
+EXPORT uint8_t *web_sysex_buf(void) { return sx_in; }
+EXPORT void web_sysex(uint32_t n) { ann_frame(sx_in, n > sizeof sx_in ? sizeof sx_in : n, now_ms); }
 EXPORT void web_buttons(uint32_t m) { held_btn = m; }
 /* key k: vel 0 = up, else held, landed at vel (1..127); press 0..1000 = how hard it is pressed now */
 EXPORT void web_key(uint32_t k, uint32_t vel, uint32_t press)
