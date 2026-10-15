@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: GPL-3.0-only
+# SPDX-License-Identifier: MIT
 """A firmware's words file for the screen reader (fm1-reader; copied into each firmware by sync_announce.sh).
 
     gen_words.py firmware/words.tsv web/words build/gen/ann_words.h
@@ -22,7 +22,7 @@ COMMON = [
     ("GLO", "global"), ("OCT+", "octave up"), ("OCT-", "octave down"), ("OCT", "octave"), ("REC", "record"),
     ("SEQ", "sequence"), ("ALGO", "algorithm"), ("ARP", "arp"), ("USB", "U S B"), ("MIDI CH #", "MIDI channel #"),
     ("MIDI", "midi"), ("dB", "decibels"), ("Hz", "hertz"), ("kHz", "kilohertz"), ("ms", "milliseconds"),
-    ("bpm", "B P M"), ("CC", "C C"), ("INF", "infinity"), ("PCT", "percent"), ("2ND", "second"),
+    ("bpm", "B P M"), ("CC #", "controller #"), ("CC", "controller"), ("INF", "infinity"), ("PCT", "percent"), ("2ND", "second"),
     ("FWD", "forward"), ("RND", "random"), ("MEM", "memory"), ("CPU", "C P U"), ("P-LOCK", "p-lock"),
     ("MIN", "minor"), ("MAJ", "major"), ("ATK", "attack"), ("DCY", "decay"), ("SUS", "sustain"),
     ("REL", "release"), ("RES", "resonance"), ("RESO", "resonance"), ("FREQ", "frequency"), ("AMT", "amount"),
