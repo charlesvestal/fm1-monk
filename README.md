@@ -79,7 +79,8 @@ screen reader.
 
 As the other firmwares (see `BUILDING.md`): `./build.sh` makes `build/monk.fwsc`,
 `sh tests/run_tests.sh` runs the host tests, `python3 tools/fm1_install.py build/monk.fwsc --yes`
-flashes. Package identity `FM-1_5` (dev builds `FM-1_500`), USB name "MONK-1 FM-1".
+flashes. Package identity `FM-1_45` + the version (dev builds `FM-1_4500`; 0.9.x
+was `FM-1_5` + the version), USB name "MONK-1 FM-1".
 
 ## Credits
 
