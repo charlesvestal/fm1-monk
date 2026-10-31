@@ -90,8 +90,11 @@ was `FM-1_5` + the version), USB name "MONK-1 FM-1".
 - The pressure routings: [MonkSynth for Schwung](https://github.com/charlesvestal/schwung-monksynth).
 - Built on the platform layer of [Felucca](https://github.com/hugelton/Felucca) (Hügelton
   Instruments, GPL-3.0-only), by way of [FoMni](https://github.com/charlesvestal/fm1-fomni) and Velo.
+- The screen reader's firmware side (`firmware/src/announce.c`, `tools/gen_words.py`):
+  [fm1-base](https://github.com/charlesvestal/fm1-base)'s, MPL-2.0 (compatible with the GPL), copied by
+  [fm1-reader](https://github.com/charlesvestal/fm1-reader)'s `tools/sync_announce.sh`.
 
-GPL-3.0-only.
+GPL-3.0-only, but those two files, which are MPL-2.0.
 
 ## How the keys sense velocity and aftertouch
 
