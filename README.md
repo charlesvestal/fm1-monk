@@ -95,8 +95,10 @@ was `FM-1_5` + the version), USB name "MONK-1 FM-1".
   [fm1-reader](https://github.com/charlesvestal/fm1-reader)'s `tools/sync_announce.sh`.
 - The flash parts the storage may use (`firmware/hal/fm1_flash_ok.h`, `tests/host/flash_ok_test.c`):
   [fm1-base](https://github.com/charlesvestal/fm1-base)'s (fm1-base#35, Laurens, @profikid), MPL-2.0.
+- The update handshake's tests (`tests/ota_hs_test.c`, `tests/host/installer_hs_test.mjs`): felucca-bsp's
+  `tests/ota_test.c` and fm1-base's `tests/installer_hs_test.mjs`, MPL-2.0.
 
-GPL-3.0-only, but those four files, which are MPL-2.0.
+GPL-3.0-only, but those six files, which are MPL-2.0.
 
 ## How the keys sense velocity and aftertouch
 

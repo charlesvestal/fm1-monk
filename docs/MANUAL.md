@@ -39,7 +39,8 @@ writing; when it finishes, the FM-1 restarts into MONK-1.
 
 **Go back:** "Back to the stock firmware", at the bottom of the same page, puts M-VAVE's firmware
 back (download the FM-1 V15 file from the link there, choose it, press the button). M-VAVE's own
-updater, M-UPGRADE, works too.
+updater, M-UPGRADE, works too. M-UPGRADE 3.11 finds this version of MONK-1, not older ones (it says "A USB
+MIDI device is present but did not answer"): use the button for those.
 
 > Installing other firmware is at your own risk. If the FM-1 ever won't start, see
 > [Recovering an FM-1 that won't start](#recovering-an-fm-1-that-won-t-start).

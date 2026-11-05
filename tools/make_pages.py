@@ -99,8 +99,8 @@ and aftertouch moves the vowel, read from the FM-1's own keys with no changes to
 <p>MonkSynth is by Jonathan Taylor (MIT), an homage to the Delay Lama plug-in. It is offered completely free of
 charge; if you enjoy it, you are kindly requested to make a donation at <a href="https://www.savetibet.org">savetibet.org</a>.</p>
 <p class="small">To go back to the official firmware, use the installer's "Back to the stock firmware", or
-M-VAVE's updater, M-UPGRADE, from <a href="https://www.m-vave.com/download">m-vave.com/download</a>.
-M-VAVE and FM-1 are trademarks of their owners. MONK-1 is not affiliated with M-VAVE.</p>
+M-VAVE's updater, M-UPGRADE, from <a href="https://www.m-vave.com/download">m-vave.com/download</a>
+(M-UPGRADE 3.11 finds the current version, not older ones). M-VAVE and FM-1 are trademarks of their owners. MONK-1 is not affiliated with M-VAVE.</p>
 </main>
 </body>
 </html>
