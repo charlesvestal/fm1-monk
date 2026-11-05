@@ -221,10 +221,10 @@ static uint8_t sense_pressure(uint32_t key)
     k = &sn_key[key];
     if (sn_cfg.drive && k->dn) {                   /* pressing harder than the landing */
         range = sn_cfg.d_at_range ? sn_cfg.d_at_range : 1u;
-        rel = k->dland > k->d ? k->dland - k->d : 0u;
+        rel = k->dland > k->d ? (uint32_t)(k->dland - k->d) : 0u;
     } else {
         range = sn_cfg.at_range ? sn_cfg.at_range : 1u;
-        rel = k->v > k->floor_ ? k->v - k->floor_ : 0u;
+        rel = k->v > k->floor_ ? (uint32_t)(k->v - k->floor_) : 0u;
     }
     if (rel >= range)
         return 127;

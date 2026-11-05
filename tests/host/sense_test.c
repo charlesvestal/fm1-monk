@@ -302,7 +302,7 @@ int main(void)
             CHECK(f0 - k->dfloor <= 24);
         }
         sn_cal_put(k, 700u << 4, 720u << 4);       /* too close: parted */
-        CHECK(k->dceil - k->dfloor >= SN_SPAN);
+        CHECK((uint32_t)(k->dceil - k->dfloor) >= SN_SPAN);
         sense_cal_reset();
         CHECK(k->dfloor == 600 && k->dceil == 1000);
         sn_cfg.drive = 1;
