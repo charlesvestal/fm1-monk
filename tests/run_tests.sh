@@ -50,6 +50,7 @@ else
     echo "  skip web (no Emscripten: the emulator, web/emu/build.sh)"
 fi
 run storage sh -c "$CC -O2 -o $OUT/storage_test tests/storage_test.c && $OUT/storage_test"
+run flash-ok sh -c "$CC -std=c99 -Wall -Wextra -Werror -o $OUT/flash_ok_test tests/host/flash_ok_test.c && $OUT/flash_ok_test"   # firmware/hal/fm1_flash_ok.h: the flash parts the storage may use
 if [ -f build/monk.fwsc ]; then
     run ota-entry sh -c "$CC -o $OUT/ota_test tests/ota_test.c && $OUT/ota_test build/monk.fwsc"
     if [ -z "${AC79_SDK:-}" ]; then

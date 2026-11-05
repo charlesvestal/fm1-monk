@@ -93,8 +93,10 @@ was `FM-1_5` + the version), USB name "MONK-1 FM-1".
 - The screen reader's firmware side (`firmware/src/announce.c`, `tools/gen_words.py`):
   [fm1-base](https://github.com/charlesvestal/fm1-base)'s, MPL-2.0 (compatible with the GPL), copied by
   [fm1-reader](https://github.com/charlesvestal/fm1-reader)'s `tools/sync_announce.sh`.
+- The flash parts the storage may use (`firmware/hal/fm1_flash_ok.h`, `tests/host/flash_ok_test.c`):
+  [fm1-base](https://github.com/charlesvestal/fm1-base)'s (fm1-base#35, Laurens, @profikid), MPL-2.0.
 
-GPL-3.0-only, but those two files, which are MPL-2.0.
+GPL-3.0-only, but those four files, which are MPL-2.0.
 
 ## How the keys sense velocity and aftertouch
 
