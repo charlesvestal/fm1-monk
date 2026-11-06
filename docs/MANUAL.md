@@ -1,12 +1,12 @@
 # MONK-1
 
-MONK-1 turns the M-VAVE FM-1 into twelve singers. Each one sings in its own voice, from a monk to a
+MONK-1 turns your M-VAVE FM-1 into twelve singers. Each one sings in its own voice, from a monk to a
 slice of pizza, on its own little stage, and its mouth follows the vowel as it sings. The voice is
-MonkSynth, Jonathan Taylor's formant vocal synthesizer. The keys have velocity and aftertouch, read
-from the FM-1's own keys with no changes to the hardware: velocity sets the note's level, aftertouch
-moves the vowel.
+MonkSynth, Jonathan Taylor's formant vocal synthesizer. The keys respond to velocity and aftertouch,
+read from the FM-1's own keys with no changes to the hardware. Play harder for a louder note, and
+press into a held key to move the vowel.
 
-![The FM-1 (a drawing), running MONK-1, each control labelled](img/fm1-panel.svg "A drawing of the FM-1's panel with each control labelled with what it does in MONK-1; section 3, Controls, lists them")
+![The FM-1 (a drawing), running MONK-1, each control labeled](img/fm1-panel.svg "A drawing of the FM-1's panel with each control labeled with what it does in MONK-1; section 3, Controls, lists them")
 
 ---
 
@@ -29,18 +29,18 @@ moves the vowel.
 
 ## 1. Install
 
-**Try it first:** the [MONK-1 emulator](https://charlesvestal.github.io/fm1-monk/emu/) runs the same
-code in the browser, with sound. Click lower on a key for more velocity and drag down for
-aftertouch; on the computer keyboard, hold Shift for aftertouch.
+To try MONK-1 first, open the [MONK-1 emulator](https://charlesvestal.github.io/fm1-monk/emu/). It runs
+the same code in your browser, with sound. Click lower on a key for more velocity, and drag down for
+aftertouch. On the computer keyboard, hold Shift for aftertouch.
 
-**Install:** open the [web installer](https://charlesvestal.github.io/fm1-monk/install/) in Chrome or
-Edge, connect the FM-1 with a USB data cable and press Install. Don't unplug it while it's
-writing; when it finishes, the FM-1 restarts into MONK-1.
+To install it, open the [web installer](https://charlesvestal.github.io/fm1-monk/install/) in Chrome
+or Edge. Connect the FM-1 with a USB data cable and press Install. Don't unplug it while it's
+writing. When it's done, the FM-1 restarts into MONK-1.
 
-**Go back:** "Back to the stock firmware", at the bottom of the same page, puts M-VAVE's firmware
-back (download the FM-1 V15 file from the link there, choose it, press the button). M-VAVE's own
-updater, M-UPGRADE, works too. M-UPGRADE 3.11 finds this version of MONK-1, not older ones (it says "A USB
-MIDI device is present but did not answer"): use the button for those.
+To go back to M-VAVE's firmware, use "Back to the stock firmware" at the bottom of the same page.
+Download the FM-1 V15 file from the link there, choose it and press the button. M-VAVE's own
+updater, M-UPGRADE, works too. M-UPGRADE 3.11 finds this version of MONK-1, but not older ones. For
+those it says "A USB MIDI device is present but did not answer", so use the button instead.
 
 > Installing other firmware is at your own risk. If the FM-1 ever won't start, see
 > [Recovering an FM-1 that won't start](#recovering-an-fm-1-that-won-t-start).
@@ -48,8 +48,8 @@ MIDI device is present but did not answer"): use the button for those.
 <details><summary>Install from the command line</summary>
 
 Download the firmware file (for example `monk-0.9.fwsc`) from the
-[releases page](https://github.com/charlesvestal/fm1-monk/releases), get the MONK-1 source from
-GitHub, install Python 3 with `pip3 install mido python-rtmidi`, and run:
+[releases page](https://github.com/charlesvestal/fm1-monk/releases) and get the MONK-1 source from
+GitHub. Install Python 3 with `pip3 install mido python-rtmidi`, then run:
 
 ```
 python3 tools/fm1_install.py monk-0.9.fwsc
@@ -61,44 +61,45 @@ python3 tools/fm1_install.py monk-0.9.fwsc
 
 ## 2. Getting started
 
-1. **Sing.** Press a key: Jerry the monk sings it. Higher velocity is louder; aftertouch on a held
-   key moves the vowel on, towards "ee".
-2. **Glide.** Hold a key and press another: the voice glides up to it. Let go of the second and it
-   glides back to the first.
-3. **Change the vowel.** Turn ALGORITHM. The mouth follows.
-4. **Meet the others.** Turn PRESETS: eleven more singers, each with its own voice.
-5. **Shape the voice.** Press HOME and turn KNOB 1–4: vowel, head size, breath, glide. The other page
-   buttons (EDIT, LFO, FX, ENV, GLO) each bring up four more.
-6. **Hold a note.** Press PLAY: the note stays after you let go, and the next key takes over.
+1. **Sing.** Press a key, and Jerry the monk sings it. Play harder for a louder note. Press into a
+   held key to move the vowel on, toward "ee".
+2. **Glide.** Hold a key and press another, and the voice glides up to it. Let go of the second, and
+   it glides back to the first.
+3. **Change the vowel.** Turn ALGORITHM, and the mouth follows.
+4. **Meet the others.** Turn PRESETS to meet eleven more singers, each with its own voice.
+5. **Shape the voice.** Press HOME and turn KNOB 1–4 to set the vowel, head size, breath and glide.
+   The other page buttons (EDIT, LFO, FX, ENV and GLO) each bring up four more.
+6. **Hold a note.** Press PLAY, and the note keeps sounding after you let go until the next key
+   takes over.
 
-Each singer remembers your changes to its voice, and MONK-1 saves them by itself a few seconds after
+Each singer remembers your changes to its voice. MONK-1 saves them by itself a few seconds after
 you stop.
 
 ---
 
 ## 3. Controls
 
-The drawing at the top shows them all; here they are in more detail.
+The drawing at the top shows every control. Here they are in more detail.
 
 | Control | What it does |
 |---|---|
-| Keys | Sing. One voice: the newest key held sounds; let go and it falls back to the key still held under it |
-| Velocity | The note's level (Touch: Velocity) |
-| Aftertouch | The vowel moves, or the pitch rises, or both (Touch: Pressure) |
-| OCT− / OCT+ | The keys an octave down or up, from −2 to +2 |
-| KNOB 1–4 | The four knobs of the page on the screen |
-| PRESETS | The singer |
-| ALGORITHM | The vowel, whichever page is on the screen |
+| Keys | Sing. There's one voice, so the newest key you hold sounds. Let go, and it falls back to the key still held under it |
+| Velocity | Sets the note's level (Touch: Velocity) |
+| Aftertouch | Moves the vowel, raises the pitch, or both (Touch: Pressure) |
+| OCT− / OCT+ | Move the keys an octave down or up, from −2 to +2 |
+| KNOB 1–4 | Turn the four knobs of the page on the screen |
+| PRESETS | Picks the singer |
+| ALGORITHM | Moves the vowel, whichever page is on the screen |
 | SELECT | Shows the menu |
-| MASTER | Volume |
-| HOME | The Sing page: vowel, head, breath, glide |
-| EDIT | The Choir page: voices, detune, spread, level |
-| LFO | The Vibrato page: depth, rate, tune |
-| FX | The Echo page: amount, time |
-| ENV | The Envelope page: attack, decay, sustain, release |
-| GLO | The Touch page: how pressure and velocity play |
-| PLAY | HOLD: the note stays after the key |
-| SAVE | Save now. Held 1.5 s: this singer's voice goes back to how it came |
+| MASTER | Sets the volume |
+| HOME | Opens the Sing page: vowel, head, breath and glide |
+| EDIT | Opens the Choir page: voices, detune, spread and level |
+| LFO | Opens the Vibrato page: depth, rate and tune |
+| FX | Opens the Echo page: amount and time |
+| ENV | Opens the Envelope page: attack, decay, sustain and release |
+| GLO | Opens the Touch page, which sets how pressure and velocity play |
+| PLAY | Turns HOLD on, so the note keeps sounding after you let go of the key |
+| SAVE | Saves now. Hold it for 1.5 s to put this singer's voice back to how it came |
 
 SEL, ARP, SEQ and REC do nothing in MONK-1.
 
@@ -109,22 +110,25 @@ SEL, ARP, SEQ and REC do nothing in MONK-1.
 ![Jerry singing](img/screen-singing.png "The screen: Jerry the monk, eyes closed, mouth wide open, in front of prayer flags, snowy mountains and the sun")
 ![The Sing page over the singer](img/screen-sing.png "The screen: HOME Sing, Jerry. Over the singer, Jerry's knobs: Vowel 50, Head 15 cm, Breath 50, Glide 50. Bottom line: PRESETS singer, ALGO vowel")
 
-Most of the time the screen is the singer on its stage. The mouth follows the vowel and opens wider
-as the note gets louder; with nothing playing, the singer blinks and mouths its vowels to itself.
+Most of the time, the screen shows the singer on its stage. The mouth follows the vowel and opens
+wider as the note gets louder. When nothing is playing, the singer blinks and mouths its vowels to
+itself.
 
-A page button, a knob or PRESETS brings up the **menu** over the singer for a few seconds:
+Press a page button or PRESETS, or turn a knob, and the **menu** comes up over the singer for a few
+seconds:
 
-- **Header:** the button that opened the page (as a keycap), the page's name, and the singer.
-- **Tag:** whose the knobs are: the singer's name (with "(edited)" once you've changed its voice), or
-  "all singers" on the Touch page, which is shared.
-- **Knobs:** KNOB 1–4, each with its name, value and a bar. The one you turned last stands out.
-- **Bottom line:** what PRESETS and ALGORITHM do.
+- The header shows the button that opened the page (drawn as a keycap), the page's name and the
+  singer.
+- The tag shows whose knobs these are. It's the singer's name, with "(edited)" once you've changed
+  its voice. On the Touch page, which all the singers share, it says "all singers".
+- The knobs show KNOB 1–4, each with its name, value and a bar. The one you turned last stands out.
+- The bottom line shows what PRESETS and ALGORITHM do.
 
 Messages such as "SAVED", "HOLD" or "OCTAVE +1" show in the header for a moment.
 
-**The lights:** the page's button is lit, and PLAY shows green while HOLD is on. The other buttons glow dimly so
-their labels can be read in the dark. While a key is held, the button lights go dark for an instant
-each time the key is read, because a lit light upsets the reading; you may see them flicker.
+The page's button is lit, and PLAY shows green while HOLD is on. The other buttons glow dimly so you
+can read their labels in the dark. While you hold a key, the button lights go dark for an instant
+each time the key is read, because a lit light upsets the reading. You may see them flicker.
 
 ---
 
@@ -133,33 +137,34 @@ each time the key is read, because a lit light upsets the reading; you may see t
 ![Aftertouch: the vowel moves on](img/screen-pressure.png "The screen: Jerry singing with his mouth half open, rounded, as the vowel moves on")
 ![The Touch page](img/screen-touch.png "The screen: GLO Touch, Jerry, for all singers: Pressure PITCH, Depth 50, Sensitive 50, Velocity 50")
 
-**One voice.** MONK-1 sings one note at a time, as a singer does. The newest key held sounds; let go
-and the voice goes back to the key still held under it. Moving between held keys glides (Sing:
-Glide; at 0 it jumps).
+**One voice.** MONK-1 sings one note at a time, the way a singer does. The newest key you hold
+sounds. Let go, and the voice goes back to the key still held under it. Moving between held keys
+glides, as set by Sing: Glide. At 0 it jumps.
 
-**Velocity** sets the note's level. Touch: Velocity says how much: at 0 every
-note is as loud as every other, at 100 a light touch is very quiet. A medium press, about velocity
-100, keeps the level the singer was made with.
+**Velocity** sets the note's level. Use Touch: Velocity to set how much. At 0, every note is as loud
+as every other. At 100, a light touch is very quiet. A medium press, about velocity 100, keeps the
+level the singer was made with.
 
 **Aftertouch** moves the voice. MONK-1 counts it from where the key comes to rest after you play it,
-not from the moment it lands, so resting a finger on a key sends none; pressing further in does. On
-the Touch page:
+not from the moment it lands. Resting a finger on a key sends none, and pressing further in does.
+Set it up on the Touch page:
 
-- **Pressure** says where aftertouch goes: VOWEL moves the vowel on, towards "ee"; PITCH bends the note up,
-  as far as two semitones; BOTH does both; BOTH INV moves the vowel back, towards "oo", as the pitch
-  rises.
-- **Depth** is how far full aftertouch moves the vowel.
-- **Sensitive:** higher means a lighter press reaches full aftertouch.
+- **Pressure** sets where aftertouch goes. VOWEL moves the vowel on, toward "ee". PITCH bends the
+  note up, as far as two semitones. BOTH does both. BOTH INV moves the vowel back, toward "oo", as
+  the pitch rises.
+- **Depth** sets how far full aftertouch moves the vowel.
+- **Sensitive** sets how hard you need to press. Turn it up, and a lighter press reaches full
+  aftertouch.
 
-The seven keys at the right end (C♯ to G) are wired differently inside the FM-1: they have velocity
+The seven keys at the right end (C♯ to G) are wired differently inside the FM-1. They have velocity
 but no aftertouch.
 
-**HOLD.** PLAY turns HOLD on: the note keeps sounding after you let go, until another key takes over
-or you press PLAY again.
+**HOLD.** Press PLAY to turn HOLD on. The note keeps sounding after you let go, until another key
+takes over or you press PLAY again.
 
-**Octave.** OCT− and OCT+ move the keys an octave, from −2 to +2. MONK-1 starts at −1, where the
-singers sit best: the lowest key is F2. A note already held ends correctly even if you change the
-octave before you let go.
+**Octave.** Press OCT− or OCT+ to move the keys an octave, from −2 to +2. MONK-1 starts at −1, where
+the singers sit best, with F2 on the lowest key. If you change the octave while holding a note, it
+still ends correctly when you let go.
 
 ---
 
@@ -170,20 +175,21 @@ octave before you let go.
 ![Razor](img/screen-cat.png "The screen: Razor, a ginger cat, singing in front of a night window")
 ![Peppo](img/screen-pizza.png "The screen: Peppo, a slice of pepperoni pizza, singing on a checked tablecloth beside a candle in a bottle")
 
-PRESETS turns through the twelve, from MonkSynth's iOS port: **Jerry** the monk, **Guppo**,
-**Philip**, **Suze**, **Gerald**, **Bess**, **EeOo**, **Snider**, **Fipsy**, **Peppo**, **Marley** and
-**Razor**. Each comes with its own voice (head size, breath, vibrato, choir, echo, envelope) and keeps
-your changes to it: change Guppo's vibrato, visit Bess, and Guppo still has your vibrato when you come
-back. Hold SAVE for 1.5 seconds to put the singer on the screen back to how it came; the others are
-not touched.
+Turn PRESETS to go through the twelve singers from MonkSynth's iOS port: **Jerry** the monk,
+**Guppo**, **Philip**, **Suze**, **Gerald**, **Bess**, **EeOo**, **Snider**, **Fipsy**, **Peppo**,
+**Marley** and **Razor**. Each comes with its own voice (head size, breath, vibrato, choir, echo and
+envelope) and keeps your changes to it. Change Guppo's vibrato, visit Bess, and Guppo still has your
+vibrato when you come back. To put the singer on the screen back to how it came, hold SAVE for 1.5
+seconds. The others stay as they are.
 
-The Touch page, the octave and the singer you were on are shared, not per singer.
+The Touch page, the octave and the singer you're on are shared, not kept per singer.
 
 ---
 
 ## 7. The pages
 
-Each page button brings up its four knobs. All values are per singer except on Touch.
+Each page button brings up its four knobs. Every value belongs to the singer, except on the Touch
+page.
 
 ![The Envelope page](img/screen-envelope.png "The screen: ENV Envelope, Jerry (edited): Attack 0.00 s, Decay 0.00 s, Sustain 100, Release 0.00 s")
 ![The Echo page](img/screen-echo.png "The screen: FX Echo, Jerry (edited): Amount 80, Time 50; knobs 3 and 4 unused")
@@ -197,29 +203,32 @@ Each page button brings up its four knobs. All values are per singer except on T
 | Envelope | ENV | Attack | Decay | Sustain | Release |
 | Touch | GLO | Pressure | Depth | Sensitive | Velocity |
 
-- **Vowel:** from "oo" through "oh", "ah" and "eh" to "ee". ALGORITHM turns it too, from any page.
-- **Head:** the size of the singer's vocal tract, in centimetres: a small head sings brighter vowels,
-  a big one darker.
-- **Breath:** noise in the voice, from clear to whispered.
-- **Glide:** how long the voice takes to slide between held keys.
-- **Voices:** a choir of up to ten, singing together. **Detune** spreads their pitches (in cents),
-  **Spread** their head sizes; **Level** is the voice's volume.
-- **Vibrato Depth** and **Rate**; **Tune** moves the whole voice up to 12 semitones either way.
-- **Echo Amount** and **Time:** a stereo echo after the voice.
-- **Envelope:** attack, decay and release in seconds (up to five), sustain as a level.
+- **Vowel** goes from "oo" through "oh", "ah" and "eh" to "ee". ALGORITHM turns it too, from any
+  page.
+- **Head** sets the size of the singer's vocal tract, in centimeters. A small head sings brighter
+  vowels, and a big one darker.
+- **Breath** adds noise to the voice, from clear to whispered.
+- **Glide** sets how long the voice takes to slide between held keys.
+- **Voices** makes a choir of up to ten, singing together. **Detune** spreads their pitches (in
+  cents), and **Spread** spreads their head sizes. **Level** sets the voice's volume.
+- **Vibrato Depth** and **Rate** shape the vibrato. **Tune** moves the whole voice up to 12
+  semitones either way.
+- **Echo Amount** and **Time** set a stereo echo after the voice.
+- **Envelope** sets the attack, decay and release in seconds (up to five), and the sustain as a
+  level.
 
 ---
 
 ## 8. MIDI
 
-Connect the FM-1 with a USB cable and it shows up as a MIDI device named "MONK-1 FM-1" (a Mac that
-knew the FM-1 with other firmware may keep the old name until you remove it in Audio MIDI Setup).
+Connect the FM-1 with a USB cable, and it shows up as a MIDI device named "MONK-1 FM-1". A Mac that
+knew the FM-1 with other firmware may keep the old name until you remove it in Audio MIDI Setup.
 
-**Out:** the notes you play, on channel 1, with the velocity they landed with, and polyphonic
-aftertouch: each held key's pressure. Record a performance and it plays back on any synth that
-listens to aftertouch.
+MONK-1 sends the notes you play on channel 1, with the velocity they landed with. It also sends
+polyphonic aftertouch, so each held key's pressure goes out too. Record a performance, and it plays
+back on any synth that listens to aftertouch.
 
-**In:** MONK-1 sings what it receives:
+MONK-1 sings whatever it receives:
 
 | Message | What it does |
 |---|---|
@@ -235,46 +244,47 @@ listens to aftertouch.
 ### Screen reader
 
 MONK-1 can tell the [FM-1 Screen Reader](https://charlesvestal.github.io/fm1-reader/) what its screen
-shows, over the same USB cable: the singer you pick, the page and its knobs, a knob's value as you turn
-it, and what each button did (hold, octave, saved). Its "Read the whole screen" button tells you
-everything at once. Open the page in Chrome with the FM-1 plugged in; it speaks with its own voice, or hands the
-words to your computer's screen reader. The singers' faces are just for looking at, so they stay quiet.
+shows, over the same USB cable. You'll hear the singer you pick, the page and its knobs, a knob's
+value as you turn it, and what each button did (hold, octave, saved). Press its "Read the whole
+screen" button to hear everything at once. Open the page in Chrome with the FM-1 plugged in. It
+speaks with its own voice, or hands the words to your computer's screen reader. The singers' faces
+are just for looking at, so they stay quiet.
 
 ---
 
 ## 9. Saving
 
-MONK-1 saves by itself about four seconds after you stop changing things (and at most every ten
-seconds). Press SAVE to save at once. What is saved: every singer's voice as you left it, the Touch
+MONK-1 saves by itself about four seconds after you stop changing things, and at most every ten
+seconds. Press SAVE to save right away. It saves every singer's voice as you left it, the Touch
 page, the octave and the singer you were on.
 
 ---
 
 ## 10. Troubleshooting
 
-**Update mode:** hold OCT− and OCT+ together for five seconds. A countdown appears; let go before it
-ends to cancel.
+To put the FM-1 in update mode, hold OCT− and OCT+ together for five seconds. A countdown appears.
+Let go before it ends to cancel.
 
-**Calibration:** if a button or knob does the wrong thing, hold OCT− and OCT+ while you switch the
-FM-1 on. The screen then asks you to press each button and turn each knob in turn.
+If a button or knob does the wrong thing, calibrate the FM-1. Hold OCT− and OCT+ while you switch it
+on, and the screen asks you to press each button and turn each knob in turn.
 
-**Velocity or aftertouch feel off:** keys differ a little from one FM-1 to the next. Turn Touch:
-Sensitive up if aftertouch hardly moves the vowel, down if it jumps; Touch: Velocity down if
-the levels vary too much.
+If velocity or aftertouch feel off, it's because keys differ a little from one FM-1 to the next. If
+aftertouch hardly moves the vowel, turn Touch: Sensitive up. If it jumps, turn it down. If the levels
+vary too much, turn Touch: Velocity down.
 
-**After a crash:** MONK-1 shows a red CRASH screen and restarts by itself a few seconds later. If you
+If MONK-1 crashes, it shows a red CRASH screen and restarts by itself a few seconds later. If you
 report the problem, include the numbers on that screen (a photo is easiest) and what you were doing.
 
-**Safe mode:** if MONK-1 crashes twice in a row while starting, it starts in SAFE MODE instead.
-There's no sound, but USB works, so the web installer can reach it: reinstall MONK-1, or put the
-stock firmware back from the same page. Press PLAY to try starting MONK-1 normally again. If even
-safe mode fails twice, the FM-1 drops into the chip's own update mode, and only the rescue below can
+If MONK-1 crashes twice in a row while starting, it starts in SAFE MODE instead. There's no sound,
+but USB works, so the web installer can reach it. You can reinstall MONK-1, or put the stock
+firmware back from the same page. Press PLAY to try starting MONK-1 normally again. If even safe
+mode fails twice, the FM-1 drops into the chip's own update mode, and only the rescue below can
 reach it.
 
 ### Recovering an FM-1 that won't start
 
 An FM-1 in the chip's own update mode shows a blank screen, and neither the web installer nor M-VAVE's
-updater can see it. A script can put M-VAVE's firmware back, on a Mac, with the USB cable you already
+updater can see it. On a Mac, a script can put M-VAVE's firmware back, using the USB cable you already
 have.
 
 Open Terminal, paste this line and press Return:
@@ -286,19 +296,19 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/charlesvestal/fm1-monk/m
 1. If a window asks to install the command line developer tools, click Install. When it has finished,
    paste the line again.
 2. If it asks for a password, type your Mac password (nothing shows as you type) and press Return.
-3. When it says it's waiting, plug the FM-1 in and switch it on. The script catches it, checks the
-   chip, saves a backup of the FM-1's memory in the `fm1-rescue` folder in your home folder, and asks
-   before it writes anything.
+3. When it says it's waiting, plug the FM-1 in and switch it on. The script catches it and checks the
+   chip. It saves a backup of the FM-1's memory in the `fm1-rescue` folder in your home folder, and
+   asks before it writes anything.
 4. Type **yes** and press Return. Don't unplug anything until it says it's restarting the FM-1. The
    FM-1 then starts into its original firmware, and you can install MONK-1 again from there.
 
 The script downloads M-VAVE's FM-1 V15 firmware and JieLi's flash loader, and checks both against known
 fingerprints. It writes only the firmware area of the memory, never the bootloader or the FM-1's own
-settings, and checks everything it writes. Running it again is always safe. If it fails, copy
+settings, and it checks everything it writes. Running it again is always safe. If it fails, copy
 everything in the Terminal window and [open an issue](https://github.com/charlesvestal/fm1-monk/issues).
 If the FM-1 never shows up at all, Felucca's
-[FM-1-transporter](https://github.com/kurogedelic/FM-1-transporter) (a small RP2040 board wired to the
-USB lines) can still reach it.
+[FM-1-transporter](https://github.com/kurogedelic/FM-1-transporter) can still reach it. It's a small
+RP2040 board wired to the USB lines.
 
 ---
 
@@ -335,12 +345,12 @@ USB lines) can still reach it.
 MONK-1 is free software under the GNU General Public License, version 3. If you share the firmware,
 you must also share its source code.
 
-- The voice is **MonkSynth** by Jonathan Taylor (MIT), ported to the FM-1; MonkSynth is itself an
-  homage to the Delay Lama plug-in by AudioNerdz (2002). MonkSynth is offered completely free of
-  charge; if you enjoy it, you are kindly requested to make a donation at
+- The voice is **MonkSynth** by Jonathan Taylor (MIT), ported to the FM-1. MonkSynth is itself an
+  homage to the Delay Lama plug-in by AudioNerdz (2002). It is offered completely free of charge. If
+  you enjoy it, you are kindly requested to make a donation at
   [savetibet.org](https://www.savetibet.org).
-- The singers, their drawings and their voices come from MonkSynth's iOS port; the pressure routings
-  from its port to Schwung.
+- The singers, their drawings and their voices come from MonkSynth's iOS port. The pressure
+  routings come from its port to Schwung.
 - The velocity and pressure come from **Velo**, which reads how hard the FM-1's keys are pressed.
 - The platform (hardware layer, USB, update loader, installer and storage) is from **Felucca** by Leo
   Kuroshita, Hügelton Instruments, by way of [X0X](https://charlesvestal.github.io/fm1-x0x/) and
@@ -349,5 +359,5 @@ you must also share its source code.
 - The idea of running FM-1 firmware in the browser comes from [Groove OS](https://www.groove-os.com/).
 - The fonts are Barlow Semi Condensed and Terminus (SIL Open Font License).
 
-M-VAVE and FM-1 are trademarks of their owners. MONK-1 is not connected with M-VAVE or Hügelton
+M-VAVE and FM-1 are trademarks of their owners. MONK-1 is not affiliated with M-VAVE or Hügelton
 Instruments.

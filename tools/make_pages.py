@@ -35,7 +35,7 @@ LANDING = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MONK-1</title>
-<meta name="description" content="Twelve singers for the M-VAVE FM-1: MonkSynth's formant voice with the characters of its iOS port, played with velocity and pressure from the FM-1's own keys.">
+<meta name="description" content="MONK-1 turns the M-VAVE FM-1 into twelve singers, with MonkSynth's formant voice and the characters of its iOS port. Play them with velocity and pressure from the FM-1's own keys.">
 <meta name="theme-color" content="#faf4e8">
 <style>
 /* MONK-1's cream, brown ink and saffron, as its screen */
@@ -72,35 +72,36 @@ code { font-size: .9em; }
 <main>
 <h1>MONK-1</h1>
 <p class="sub">Twelve singers for the M-VAVE FM-1</p>
-<p class="lede">MonkSynth's singing voice on the FM-1, with the twelve characters of its iOS port, from a monk to a
-slice of pizza, each on its own stage, its mouth following the vowel. Velocity sets the level
-and aftertouch moves the vowel, read from the FM-1's own keys with no changes to the hardware.</p>
+<p class="lede">MONK-1 puts MonkSynth's singing voice on your FM-1, with the twelve characters of its iOS port.
+They range from a monk to a slice of pizza, each on its own stage, and each mouth follows the vowel as it sings.
+Play harder for a louder note, and press into a held key to move the vowel. The FM-1's own keys do it, with no
+changes to the hardware.</p>
 <div class="shots">
   <img src="img/screen-singing.png" width="240" height="240" alt="Jerry the monk singing, mouth wide open">
   <img src="img/screen-unicorn.png" width="240" height="240" alt="Philip the unicorn singing in front of a rainbow">
   <img src="img/screen-punk.png" width="240" height="240" alt="Snider the punk singing between two speakers">
 </div>
 <nav class="ways" aria-label="Get MONK-1">
-  <a href="emu/"><strong>Try it in the browser</strong><span>The same code the FM-1 runs, with sound. Click lower on a key for more velocity; drag down for aftertouch. Works from the keyboard too.</span></a>
-  <a href="install/"><strong>Install <em class="v">v__VERSION__</em></strong><span>From Chrome or Edge, with the FM-1 connected by USB. Nothing to install on the computer.</span></a>
-  <a href="manual/"><strong>Manual</strong><span>Getting started in a few minutes, then everything else.</span></a>
+  <a href="emu/"><strong>Try it in the browser</strong><span>Play it right here, with sound. It runs the same code as the FM-1. Click lower on a key for more velocity, and drag down for aftertouch. You can play it from the computer keyboard too.</span></a>
+  <a href="install/"><strong>Install <em class="v">v__VERSION__</em></strong><span>Connect your FM-1 by USB and install from Chrome or Edge. There's nothing to install on your computer.</span></a>
+  <a href="manual/"><strong>Manual</strong><span>Get started in a few minutes, then look up everything else.</span></a>
   <a href="firmware/__PKG__"><strong>Download <em class="v">__PKG__</em></strong><span>For the command-line installer: <code>python3 tools/fm1_install.py __PKG__</code></span></a>
-  <a href="__REPO__"><strong>Source</strong><span>GitHub, GPL-3.0. Built on Felucca by Hügelton Instruments.</span></a>
+  <a href="__REPO__"><strong>Source</strong><span>On GitHub under GPL-3.0. Built on Felucca by Hügelton Instruments.</span></a>
 </nav>
 
 <h2>What it does</h2>
 <ul class="feat">
-  <li><b>Twelve singers.</b> Jerry the monk, Guppo, Philip, Suze, Gerald, Bess, EeOo, Snider, Fipsy, Peppo, Marley and Razor, each with its own voice, each remembering your changes.</li>
-  <li><b>Velocity</b> sets the note's level, read from the FM-1's own keys.</li>
-  <li><b>Aftertouch</b> moves the vowel, bends the pitch, or both, counted from where the key rests.</li>
-  <li><b>The voice.</b> MonkSynth's formant synthesis: vowel, head size, breath, glide, a choir of up to ten, vibrato, echo and an envelope, four knobs a page.</li>
-  <li><b>MIDI.</b> Notes with velocity and polyphonic aftertouch out over USB; notes, aftertouch and the vowel in.</li>
+  <li>Pick from <b>twelve singers</b>: Jerry the monk, Guppo, Philip, Suze, Gerald, Bess, EeOo, Snider, Fipsy, Peppo, Marley and Razor. Each has its own voice and remembers your changes.</li>
+  <li>Play harder for a louder note. The FM-1's own keys read the <b>velocity</b>.</li>
+  <li>Press into a held key for <b>aftertouch</b>, to move the vowel, bend the pitch, or both. It counts from where the key comes to rest.</li>
+  <li>Shape <b>the voice</b>, MonkSynth's formant synthesis, four knobs at a time. Set the vowel, head size, breath and glide, add a choir of up to ten, and give it vibrato, echo and an envelope.</li>
+  <li>Use it over <b>MIDI</b>. It sends notes with velocity and polyphonic aftertouch over USB, and sings the notes, aftertouch and vowel it receives.</li>
 </ul>
-<p>MonkSynth is by Jonathan Taylor (MIT), an homage to the Delay Lama plug-in. It is offered completely free of
-charge; if you enjoy it, you are kindly requested to make a donation at <a href="https://www.savetibet.org">savetibet.org</a>.</p>
-<p class="small">To go back to the official firmware, use the installer's "Back to the stock firmware", or
-M-VAVE's updater, M-UPGRADE, from <a href="https://www.m-vave.com/download">m-vave.com/download</a>
-(M-UPGRADE 3.11 finds the current version, not older ones). M-VAVE and FM-1 are trademarks of their owners. MONK-1 is not affiliated with M-VAVE.</p>
+<p>MonkSynth is by Jonathan Taylor (MIT), and is an homage to the Delay Lama plug-in. It is offered completely free of
+charge. If you enjoy it, you are kindly requested to make a donation at <a href="https://www.savetibet.org">savetibet.org</a>.</p>
+<p class="small">To go back to the official firmware, use "Back to the stock firmware" in the installer, or
+M-VAVE's own updater, M-UPGRADE, from <a href="https://www.m-vave.com/download">m-vave.com/download</a>.
+M-UPGRADE 3.11 finds the current version of MONK-1, but not older ones. M-VAVE and FM-1 are trademarks of their owners. MONK-1 is not affiliated with M-VAVE.</p>
 </main>
 </body>
 </html>
