@@ -296,19 +296,20 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/charlesvestal/fm1-monk/m
 1. If a window asks to install the command line developer tools, click Install. When it has finished,
    paste the line again.
 2. If it asks for a password, type your Mac password (nothing shows as you type) and press Return.
-3. When it says it's waiting, plug the FM-1 in and switch it on. The script catches it and checks the
-   chip. It saves a backup of the FM-1's memory in the `fm1-rescue` folder in your home folder, and
-   asks before it writes anything.
+3. When it says it's waiting, plug the FM-1 in and switch it on. If it starts normally instead, hold OCT−
+   and OCT+ until the countdown ends and the screen goes black. The script catches it and checks the
+   chip. It saves a backup of the FM-1's memory in the `fm1-rescue` folder in your home folder, and asks
+   before it writes anything.
 4. Type **yes** and press Return. Don't unplug anything until it says it's restarting the FM-1. The
    FM-1 then starts into its original firmware, and you can install MONK-1 again from there.
 
-The script downloads M-VAVE's FM-1 V15 firmware and JieLi's flash loader, and checks both against known
-fingerprints. It writes only the firmware area of the memory, never the bootloader or the FM-1's own
-settings, and it checks everything it writes. Running it again is always safe. If it fails, copy
-everything in the Terminal window and [open an issue](https://github.com/charlesvestal/fm1-monk/issues).
-If the FM-1 never shows up at all, Felucca's
-[FM-1-transporter](https://github.com/kurogedelic/FM-1-transporter) can still reach it. It's a small
-RP2040 board wired to the USB lines.
+The script downloads M-VAVE's FM-1 firmware (V16 and V15) and JieLi's flash loader, and checks them
+against known fingerprints. It writes only the firmware area of the memory, never the bootloader or the
+FM-1's own settings, and it checks everything it writes. Running it again is always safe. If it fails,
+copy everything in the Terminal window and
+[open an issue](https://github.com/charlesvestal/fm1-monk/issues). If the FM-1 never shows up at all,
+Felucca's [FM-1-transporter](https://github.com/kurogedelic/FM-1-transporter) can still reach it. It's a
+small RP2040 board wired to the USB lines.
 
 ---
 
