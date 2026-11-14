@@ -133,3 +133,5 @@ press (`firmware/src/app/sense.c`, from [Velo](https://github.com/charlesvestal/
   sampled (`FM1_INPUT_LED_OK`).
 
 `tests/host/sense_test.c` runs the sensing on synthetic press curves.
+
+You can also try MONK-1 in the browser, no flashing needed, in the free community [FM-1 Emulator](https://fm1-emulator.atst.tools/).
